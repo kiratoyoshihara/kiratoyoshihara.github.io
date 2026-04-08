@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Name</title>
+  <title>Kirato Yoshihara</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
@@ -11,43 +11,95 @@
       --fg: #1a1a1a;
       --fg-dim: #6b6b6b;
       --bg: #faf9f6;
-      --accent: #2d5016;
+      --accent: #6495ED;
       --rule: #d4d0c8;
       --serif: 'EB Garamond', Georgia, serif;
       --mono: 'JetBrains Mono', monospace;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: var(--serif);
       background: var(--bg);
       color: var(--fg);
       font-size: 1.15rem;
       line-height: 1.7;
-      padding: 4rem 2rem 6rem;
-      max-width: 640px;
-      margin: 0 auto;
       -webkit-font-smoothing: antialiased;
     }
-
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250,249,246,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 3rem;
+      gap: 2.5rem;
+    }
+    nav li a {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      text-decoration: none;
+      border: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    nav li a:hover { color: var(--accent); }
+    nav li a.active { color: var(--fg); font-weight: 600; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .hero {
+      display: flex;
+      align-items: center;
+      min-height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 3rem 3rem;
+      gap: 3rem;
+    }
+    .hero-text { flex: 1; max-width: 560px; }
+    .hero-visual { flex: 1; position: relative; min-height: 500px; }
+    .hero-visual canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+    }
+    .page-content {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 7rem 2rem 6rem;
+      min-height: 100vh;
+    }
+    @media (max-width: 768px) {
+      nav ul { padding: 0.7rem 1.5rem; gap: 1.5rem; }
+      .hero {
+        flex-direction: column;
+        padding: 5rem 1.5rem 2rem;
+        min-height: auto;
+      }
+      .hero-visual { min-height: 300px; order: -1; }
+      .page-content { padding: 5rem 1.5rem 4rem; }
+    }
     h1 {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       margin-bottom: 0.3rem;
     }
-
     .tagline {
       color: var(--fg-dim);
       font-style: italic;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
-
-    .section {
-      margin-bottom: 2.5rem;
-    }
-
+    .section { margin-bottom: 2.5rem; }
     .section-title {
       font-family: var(--mono);
       font-size: 0.78rem;
@@ -58,149 +110,337 @@
       padding-bottom: 0.4rem;
       margin-bottom: 1rem;
     }
-
-    .bio {
-      margin-bottom: 0;
-    }
-
-    .interests {
-      color: var(--fg-dim);
-      font-style: italic;
-    }
-
-    .believe-list {
-      list-style: none;
-      padding: 0;
-    }
-
-    .believe-list li {
+    .interests { color: var(--fg-dim); font-style: italic; }
+    .fun-list, .believe-list { list-style: none; padding: 0; }
+    .fun-list li, .believe-list li {
       position: relative;
       padding-left: 1.4rem;
       margin-bottom: 0.5rem;
     }
-
-    .believe-list li::before {
-      content: '·';
-      position: absolute;
-      left: 0;
+    .fun-list li::before, .believe-list li::before {
+      content: '\00B7';
+      position: absolute; left: 0;
       color: var(--accent);
       font-weight: 600;
       font-size: 1.4rem;
       line-height: 1.5;
     }
-
-    .pub {
-      margin-bottom: 1.2rem;
-    }
-
-    .pub-title {
-      font-weight: 600;
-    }
-
-    .pub-authors {
-      color: var(--fg-dim);
-      font-size: 0.95rem;
-    }
-
-    .pub-venue {
-      font-style: italic;
-      color: var(--fg-dim);
-      font-size: 0.95rem;
-    }
-
+    .pub { margin-bottom: 1.2rem; }
+    .pub-title { font-weight: 600; }
+    .pub-authors, .pub-venue { color: var(--fg-dim); font-size: 0.95rem; }
+    .pub-venue { font-style: italic; }
     a {
       color: var(--accent);
       text-decoration: none;
       border-bottom: 1px solid transparent;
       transition: border-color 0.2s;
     }
-
-    a:hover {
-      border-bottom-color: var(--accent);
-    }
-
-    .contact {
-      font-size: 0.95rem;
-      color: var(--fg-dim);
-    }
-
-    .contact a {
-      margin-right: 1.2rem;
-    }
-
-    footer {
-      margin-top: 4rem;
-      font-size: 0.8rem;
-      color: var(--rule);
+    a:hover { border-bottom-color: var(--accent); }
+    .contact-links { list-style: none; padding: 0; }
+    .contact-links li { margin-bottom: 0.8rem; }
+    .contact-links a { font-size: 1.1rem; }
+    .contact-links .label {
       font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 0.15rem;
     }
   </style>
 </head>
 <body>
 
-  <h1>Your Name</h1>
-  <p class="tagline">PhD Student at [University] — figuring things out, one experiment at a time.</p>
-
-  <!-- About -->
-  <div class="section">
-    <div class="section-title">About</div>
-    <p class="bio">
-      Hi, I'm [Your Name]. I'm a researcher at [Lab / University], working on [brief description].
-      Previously I was at [previous affiliation].
-      I care about [something you care about beyond research].
-    </p>
-  </div>
-
-  <!-- Research Interests -->
-  <div class="section">
-    <div class="section-title">Research Interests</div>
-    <p class="interests">
-      keyword one, keyword two, keyword three, keyword four
-    </p>
-  </div>
-
-  <!-- Things I Believe -->
-  <div class="section">
-    <div class="section-title">Some Things I Believe</div>
-    <ul class="believe-list">
-      <li>Fail fast, Move fast</li>
-      <li>Good alone, Unstoppable together</li>
-      <li>Less is More</li>
-      <li>We can do more than we think</li>
+  <nav>
+    <ul>
+      <li><a class="nav-link active" data-page="home">Home</a></li>
+      <li><a class="nav-link" data-page="research">Research</a></li>
+      <li><a class="nav-link" data-page="contact">Contact</a></li>
     </ul>
-  </div>
+  </nav>
 
-  <!-- Publications -->
-  <div class="section">
-    <div class="section-title">Publications</div>
-
-    <div class="pub">
-      <div class="pub-title"><a href="https://arxiv.org/abs/XXXX.XXXXX">Paper Title Here</a></div>
-      <div class="pub-authors">Your Name, Co-Author A, Co-Author B</div>
-      <div class="pub-venue">Conference / Journal, 2025</div>
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Kirato Yoshihara</h1>
+        <p class="tagline">Gradient Descent towards a big impact.</p>
+        <div class="section">
+          <div class="section-title">About</div>
+          <p>
+            Hi there! I'm Kirato — a builder with research at heart, currently a final-year undergrad at The University of Osaka.
+            Research intern at <a href="https://www.aist.go.jp/aist_e/about_aist/">AIST</a>, previously at <a href="https://www.preferred.jp/en">Preferred Networks</a>.
+          </p>
+        </div>
+        <div class="section">
+          <div class="section-title">Research Interests</div>
+          <p class="interests">Foundation Models, Efficient Learning, Representation Learning</p>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <canvas id="ur5e"></canvas>
+      </div>
     </div>
+  </div>
 
-    <div class="pub">
-      <div class="pub-title"><a href="https://arxiv.org/abs/XXXX.XXXXX">Another Paper Title</a></div>
-      <div class="pub-authors">Co-Author A, Your Name, Co-Author C</div>
-      <div class="pub-venue">Workshop on Something, 2024</div>
+  <div class="page" id="page-research">
+    <div class="page-content">
+      <div class="section">
+        <div class="section-title">Publications</div>
+        <div class="pub">
+          <div class="pub-title"><a href="https://arxiv.org/abs/2602.23782">Breaking the Data Barrier: Robust Few-Shot 3D Vessel Segmentation using Foundation Models</a></div>
+          <div class="pub-authors">Kirato Yoshihara, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
+          <div class="pub-venue">Under Review MICCAI 2026</div>
+        </div>
+      </div>
     </div>
-
-    <!-- Add more <div class="pub">...</div> blocks as needed -->
   </div>
 
-  <!-- Contact -->
-  <div class="section">
-    <div class="section-title">Contact</div>
-    <p class="contact">
-      <a href="mailto:you@example.com">email</a>
-      <a href="https://scholar.google.com/citations?user=XXXXX">google scholar</a>
-      <a href="https://github.com/yourusername">github</a>
-      <a href="https://x.com/yourusername">x / twitter</a>
-    </p>
+  <div class="page" id="page-contact">
+    <div class="page-content">
+      <div class="section">
+        <div class="section-title">Contact</div>
+        <ul class="contact-links">
+          <li>
+            <span class="label">Email</span>
+            <a href="mailto:kiratoyoshihara@gmail.com">kiratoyoshihara@gmail.com</a>
+          </li>
+          <li>
+            <span class="label">GitHub</span>
+            <a href="https://github.com/kiratoyoshihara" target="_blank">github.com/kiratoyoshihara</a>
+          </li>
+          <li>
+            <span class="label">LinkedIn</span>
+            <a href="https://linkedin.com/in/kirato-yoshihara-21560330a" target="_blank">linkedin.com/in/kiratoyoshihara</a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <footer>&copy; 2025</footer>
+<script>
+document.querySelectorAll('.nav-link').forEach(function(link){
+  link.addEventListener('click', function(){
+    var target = this.getAttribute('data-page');
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
+    document.getElementById('page-' + target).classList.add('active');
+    this.classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
 
+var canvas = document.getElementById('ur5e');
+var ctx = canvas.getContext('2d');
+var container = canvas.parentElement;
+
+var W, H, dpr;
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  W = container.offsetWidth;
+  H = container.offsetHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+function sampleLink(p1,p2,radius,count){
+  var pts=[];
+  var dx=p2.x-p1.x,dy=p2.y-p1.y,dz=p2.z-p1.z;
+  var len=Math.sqrt(dx*dx+dy*dy+dz*dz);
+  if(len<0.001)return pts;
+  var ax=dx/len,ay=dy/len,az=dz/len;
+  var bx,by,bz;
+  if(Math.abs(ax)<0.9){bx=0;by=-az;bz=ay;}else{bx=-az;by=0;bz=ax;}
+  var bl=Math.sqrt(bx*bx+by*by+bz*bz);bx/=bl;by/=bl;bz/=bl;
+  var cx=ay*bz-az*by,cy=az*bx-ax*bz,cz=ax*by-ay*bx;
+  for(var i=0;i<count;i++){var t=Math.random(),th=Math.random()*Math.PI*2;
+    pts.push({x:p1.x+dx*t+(Math.cos(th)*bx+Math.sin(th)*cx)*radius,y:p1.y+dy*t+(Math.cos(th)*by+Math.sin(th)*cy)*radius,z:p1.z+dz*t+(Math.cos(th)*bz+Math.sin(th)*cz)*radius});}
+  for(var i=0;i<count*0.2;i++){var th=Math.random()*Math.PI*2,r=Math.random()*radius;
+    pts.push({x:p1.x+(Math.cos(th)*bx+Math.sin(th)*cx)*r,y:p1.y+(Math.cos(th)*by+Math.sin(th)*cy)*r,z:p1.z+(Math.cos(th)*bz+Math.sin(th)*cz)*r});
+    pts.push({x:p2.x+(Math.cos(th)*bx+Math.sin(th)*cx)*r,y:p2.y+(Math.cos(th)*by+Math.sin(th)*cy)*r,z:p2.z+(Math.cos(th)*bz+Math.sin(th)*cz)*r});}
+  return pts;
+}
+function sampleSphere(center,radius,count){
+  var pts=[];for(var i=0;i<count;i++){var th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+    pts.push({x:center.x+radius*Math.sin(ph)*Math.cos(th),y:center.y+radius*Math.sin(ph)*Math.sin(th),z:center.z+radius*Math.cos(ph)});}return pts;
+}
+function sampleDisc(center,axis,radius,count){
+  var pts=[];var bx,by,bz;
+  if(Math.abs(axis.x)<0.9){bx=0;by=-axis.z;bz=axis.y;}else{bx=-axis.z;by=0;bz=axis.x;}
+  var bl=Math.sqrt(bx*bx+by*by+bz*bz);bx/=bl;by/=bl;bz/=bl;
+  var cx=axis.y*bz-axis.z*by,cy=axis.z*bx-axis.x*bz,cz=axis.x*by-axis.y*bx;
+  for(var i=0;i<count;i++){var th=Math.random()*Math.PI*2,r=radius*Math.sqrt(Math.random()),h=(Math.random()-0.5)*0.02;
+    pts.push({x:center.x+(Math.cos(th)*bx+Math.sin(th)*cx)*r+axis.x*h,y:center.y+(Math.cos(th)*by+Math.sin(th)*cy)*r+axis.y*h,z:center.z+(Math.cos(th)*bz+Math.sin(th)*cz)*r+axis.z*h});}return pts;
+}
+function solveIK(ll,target){
+  var n=ll.length,joints=[{x:0,y:0}],cumY=0;
+  for(var i=0;i<n;i++){cumY+=ll[i];joints.push({x:0,y:cumY});}
+  var tl=ll.reduce(function(a,b){return a+b;},0);
+  var dist=Math.sqrt(target.x*target.x+target.y*target.y);
+  var tx=target.x,ty=target.y;
+  if(dist>tl*0.95){tx*=(tl*0.95)/dist;ty*=(tl*0.95)/dist;}
+  for(var iter=0;iter<15;iter++){
+    joints[n]={x:tx,y:ty};
+    for(var i=n-1;i>=0;i--){var ddx=joints[i].x-joints[i+1].x,ddy=joints[i].y-joints[i+1].y;var d=Math.sqrt(ddx*ddx+ddy*ddy)||0.001;joints[i]={x:joints[i+1].x+ddx/d*ll[i],y:joints[i+1].y+ddy/d*ll[i]};}
+    joints[0]={x:0,y:0};
+    for(var i=0;i<n;i++){var ddx=joints[i+1].x-joints[i].x,ddy=joints[i+1].y-joints[i].y;var d=Math.sqrt(ddx*ddx+ddy*ddy)||0.001;joints[i+1]={x:joints[i].x+ddx/d*ll[i],y:joints[i].y+ddy/d*ll[i]};}}
+  return joints;
+}
+function buildUR5e(){
+  var silver={r:180,g:185,b:190},blue={r:130,g:175,b:210},darkGrey={r:60,g:62,b:65};
+  var density=800,links=[0.34,0.42,0.35,0.18];
+  var tl=links.reduce(function(a,b){return a+b;},0);
+  var angle=Math.random()*Math.PI*0.8-Math.PI*0.15;
+  var reach=0.4+Math.random()*0.45;
+  var target={x:Math.sin(angle)*tl*reach,y:Math.cos(angle)*tl*reach};
+  var j2d=solveIK(links,target);
+  var j3d=j2d.map(function(j){return{x:j.x,y:j.y,z:0};});
+  var all=[];
+  var lr=[0.07,0.065,0.055,0.04],jr=[0.10,0.09,0.08,0.06,0.04];
+  var ld=[density,density*1.2,density,density*0.5];
+  var jd=[density*0.7,density*0.7,density*0.6,density*0.5,density*0.3];
+  var jc=[blue,blue,blue,blue,darkGrey];
+  var bp=sampleDisc({x:0,y:-0.04,z:0},{x:0,y:1,z:0},0.15,density);bp.forEach(function(p){p.col=darkGrey;});all=all.concat(bp);
+  var bj=sampleDisc(j3d[0],{x:0,y:1,z:0},0.12,density*0.6);bj.forEach(function(p){p.col=blue;});all=all.concat(bj);
+  for(var i=0;i<links.length;i++){
+    var lp=sampleLink(j3d[i],j3d[i+1],lr[i],ld[i]);lp.forEach(function(p){p.col=silver;});all=all.concat(lp);
+    var jp=sampleSphere(j3d[i+1],jr[i+1],jd[i+1]);jp.forEach(function(p){p.col=jc[i+1];});all=all.concat(jp);}
+  var minY=Infinity,maxY=-Infinity,minX=Infinity,maxX=-Infinity;
+  for(var k=0;k<all.length;k++){var p=all[k];if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;}
+  var ccx=(minX+maxX)/2,ccy=(minY+maxY)/2;
+  for(var k=0;k<all.length;k++){all[k].x-=ccx;all[k].y-=ccy;}
+  return all;
+}
+
+/* --- Coffee cup: cylinder body + handle torus arc --- */
+function buildCoffeeCup(){
+  var white={r:210,g:205,b:195};
+  var brown={r:90,g:50,b:20};
+  var darkGrey={r:20,g:20,b:20};
+  var all=[];
+  var d=1300;
+
+  // Cup body: cylinder, wider at top
+  var bodyH=0.5, botR=0.22, topR=0.26;
+  for(var i=0;i<d*1.5;i++){
+    var t=Math.random();
+    var th=Math.random()*Math.PI*2;
+    var r=botR+(topR-botR)*t;
+    all.push({x:Math.cos(th)*r, y:t*bodyH, z:Math.sin(th)*r, col:white});
+  }
+  // Bottom disc
+  for(var i=0;i<d*0.4;i++){
+    var th=Math.random()*Math.PI*2;
+    var r=Math.random()*botR;
+    all.push({x:Math.cos(th)*r, y:0, z:Math.sin(th)*r, col:white});
+  }
+  // Coffee surface (brown disc near top)
+  var coffeeY=bodyH*0.85;
+  var coffeeR=botR+(topR-botR)*0.85-0.01;
+  for(var i=0;i<d*0.5;i++){
+    var th=Math.random()*Math.PI*2;
+    var r=Math.random()*coffeeR;
+    all.push({x:Math.cos(th)*r, y:coffeeY, z:Math.sin(th)*r, col:brown});
+  }
+  // Rim (top ring, slightly thicker)
+  for(var i=0;i<d*0.3;i++){
+    var th=Math.random()*Math.PI*2;
+    var rr=topR+(Math.random()-0.5)*0.015;
+    all.push({x:Math.cos(th)*rr, y:bodyH, z:Math.sin(th)*rr, col:white});
+  }
+  // Handle: C-shaped arc attached to the cup side
+  var handleTop=bodyH*0.75;
+  var handleBot=bodyH*0.3;
+  var handleMidY=(handleTop+handleBot)/2;
+  var handleHalfH=(handleTop-handleBot)/2;
+  var cupRadAtMid=botR+(topR-botR)*(handleMidY/bodyH);
+  var handleDepth=0.14;
+  var tubeR=0.025;
+  for(var i=0;i<d*0.6;i++){
+    // Arc from -PI/2 to PI/2 (C shape on the right side)
+    var a=-Math.PI/2+Math.random()*Math.PI;
+    var hx=cupRadAtMid+handleDepth*Math.cos(a);
+    var hy=handleMidY+handleHalfH*Math.sin(a);
+    var tth=Math.random()*Math.PI*2;
+    var tx=Math.cos(tth)*tubeR;
+    var tz=Math.sin(tth)*tubeR;
+    all.push({x:hx+tx, y:hy, z:tz, col:white});
+  }
+  // Saucer: flat disc below cup
+  var saucerY=-0.03;
+  for(var i=0;i<d*0.6;i++){
+    var th=Math.random()*Math.PI*2;
+    var r=Math.random()*0.38;
+    var h=(Math.random()-0.5)*0.02;
+    all.push({x:Math.cos(th)*r, y:saucerY+h, z:Math.sin(th)*r, col:darkGrey});
+  }
+  // Saucer rim
+  for(var i=0;i<d*0.2;i++){
+    var th=Math.random()*Math.PI*2;
+    var r=0.37+(Math.random()-0.5)*0.02;
+    all.push({x:Math.cos(th)*r, y:saucerY, z:Math.sin(th)*r, col:darkGrey});
+  }
+
+  // Center
+  var minY=Infinity,maxY=-Infinity,minX=Infinity,maxX=-Infinity;
+  for(var k=0;k<all.length;k++){var p=all[k];if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;}
+  var ccx=(minX+maxX)/2,ccy=(minY+maxY)/2;
+  for(var k=0;k<all.length;k++){all[k].x-=ccx;all[k].y-=ccy;}
+  return all;
+}
+
+function project(x,y,z,rY,rX,s){
+  var x1=x*Math.cos(rY)-z*Math.sin(rY),z1=x*Math.sin(rY)+z*Math.cos(rY);
+  var y1=y*Math.cos(rX)-z1*Math.sin(rX),z2=y*Math.sin(rX)+z1*Math.cos(rX);
+  var pr=4,sc=pr/(pr+z2);return{px:x1*sc*s+W/2,py:-y1*sc*s+H/2,depth:z2};
+}
+
+var pts3d=[],particles=[],startTime=0,isCoffee=false;
+var DENOISE=3000,HOLD=4000,DISSOLVE=4000,PAUSE=1200,TOTAL=DENOISE+HOLD+DISSOLVE+PAUSE;
+function initCycle(){
+  // 5% chance of coffee cup easter egg
+  isCoffee=Math.random()<0.05;
+  if(isCoffee){
+    pts3d=buildCoffeeCup();
+  }else{
+    pts3d=buildUR5e();
+  }
+  particles=[];
+  for(var i=0;i<pts3d.length;i++)particles.push({nx:Math.random()*W,ny:Math.random()*H,idx:i,delay:Math.random()*0.2,size:0.8+Math.random()*0.6});
+  startTime=performance.now();
+}
+function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+function draw(){
+  ctx.fillStyle='#faf9f6';ctx.fillRect(0,0,W,H);
+  var now=performance.now(),elapsed=now-startTime;
+  if(elapsed>TOTAL){initCycle();requestAnimationFrame(draw);return;}
+  var scale=Math.min(W,H)*0.5,rY=now*0.00015;
+  var rX=isCoffee ? -0.7-Math.sin(now*0.0002)*0.05 : 0.15+Math.sin(now*0.0002)*0.1;
+  var proj=[];for(var i=0;i<pts3d.length;i++)proj.push(project(pts3d[i].x,pts3d[i].y,pts3d[i].z,rY,rX,scale));
+  var idx=[];for(var i=0;i<particles.length;i++)idx.push(i);
+  idx.sort(function(a,b){return proj[particles[a].idx].depth-proj[particles[b].idx].depth;});
+  for(var k=0;k<idx.length;k++){
+    var i=idx[k],p=particles[i],pt=pts3d[p.idx],pr=proj[p.idx];
+    var progress;
+    if(elapsed<DENOISE){var raw=elapsed/DENOISE;var t=Math.max(0,Math.min(1,(raw-p.delay)/(1-p.delay)));progress=ease(t);}
+    else if(elapsed<DENOISE+HOLD){progress=1;}
+    else if(elapsed<DENOISE+HOLD+DISSOLVE){var raw2=(elapsed-DENOISE-HOLD)/DISSOLVE;var t2=Math.max(0,Math.min(1,(raw2-p.delay)/(1-p.delay)));progress=1-ease(t2);}
+    else{progress=0;}
+    var x=p.nx+(pr.px-p.nx)*progress,y=p.ny+(pr.py-p.ny)*progress;
+    var jt=(1-progress)*10,jx=(Math.random()-0.5)*jt,jy=(Math.random()-0.5)*jt;
+    var ng=140+Math.random()*60,col=pt.col;
+    var cr=Math.round(ng+(col.r-ng)*progress),cg=Math.round(ng+(col.g-ng)*progress),cb=Math.round(ng+(col.b-ng)*progress);
+    var dn=(pr.depth+1)/2,alpha=(0.15+dn*0.15)+progress*0.5,sz=p.size*(0.5+dn*0.5)*(0.5+progress*0.5);
+    ctx.beginPath();ctx.arc(x+jx,y+jy,sz,0,Math.PI*2);
+    ctx.fillStyle='rgba('+cr+','+cg+','+cb+','+Math.min(alpha,0.85)+')';ctx.fill();}
+  requestAnimationFrame(draw);
+}
+initCycle();draw();
+</script>
 </body>
 </html>
