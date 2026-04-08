@@ -148,6 +148,19 @@
       display: block;
       margin-bottom: 0.15rem;
     }
+    .qa-list { margin: 0; padding: 0; }
+    .qa-list dt {
+      color: var(--fg-dim);
+      font-style: italic;
+      margin-bottom: 0.15rem;
+      margin-top: 1rem;
+    }
+    .qa-list dt:first-child { margin-top: 0; }
+    .qa-list dd {
+      margin-left: 1.4rem;
+      margin-bottom: 0;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -156,6 +169,7 @@
     <ul>
       <li><a class="nav-link active" data-page="home">Home</a></li>
       <li><a class="nav-link" data-page="research">Research</a></li>
+      <li><a class="nav-link" data-page="funfacts">Fun Facts</a></li>
       <li><a class="nav-link" data-page="contact">Contact</a></li>
     </ul>
   </nav>
@@ -192,6 +206,30 @@
           <div class="pub-authors">Kirato Yoshihara, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
           <div class="pub-venue">Under Review MICCAI 2026</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-funfacts">
+    <div class="page-content">
+      <div class="section">
+        <div class="section-title">Fun Facts about Me</div>
+        <dl class="qa-list">
+          <dt>Mac or Windows?</dt>
+          <dd>Mac</dd>
+
+          <dt>Coffee or tea?</dt>
+          <dd>Coffee</dd>
+
+          <dt>City or nature?</dt>
+          <dd>Nature — a.k.a. Nagano</dd>
+
+          <dt>Favorite editor</dt>
+          <dd>Claude</dd>
+
+          <dt>Best model weights?</dt>
+          <dd>model_final_v4_actually_best_20260409_0342_newer_important.pth</dd>
+        </dl>
       </div>
     </div>
   </div>
@@ -401,10 +439,10 @@ function project(x,y,z,rY,rX,s){
 }
 
 var pts3d=[],particles=[],startTime=0,isCoffee=false;
-var DENOISE=3000,HOLD=4000,DISSOLVE=4000,PAUSE=1200,TOTAL=DENOISE+HOLD+DISSOLVE+PAUSE;
+var DENOISE=4000,HOLD=5000,DISSOLVE=4000,PAUSE=100,TOTAL=DENOISE+HOLD+DISSOLVE+PAUSE;
 function initCycle(){
-  // 5% chance of coffee cup easter egg
-  isCoffee=Math.random()<0.05;
+  // 15% chance of coffee cup easter egg
+  isCoffee=Math.random()<0.15;
   if(isCoffee){
     pts3d=buildCoffeeCup();
   }else{
