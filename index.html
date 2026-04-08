@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Name</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --fg-dim: #6b6b6b;
+      --bg: #faf9f6;
+      --accent: #2d5016;
+      --rule: #d4d0c8;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 1.15rem;
+      line-height: 1.7;
+      padding: 4rem 2rem 6rem;
+      max-width: 640px;
+      margin: 0 auto;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .tagline {
+      color: var(--fg-dim);
+      font-style: italic;
+      margin-bottom: 2.5rem;
+    }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--fg-dim);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .bio {
+      margin-bottom: 0;
+    }
+
+    .interests {
+      color: var(--fg-dim);
+      font-style: italic;
+    }
+
+    .believe-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .believe-list li {
+      position: relative;
+      padding-left: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .believe-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 1.4rem;
+      line-height: 1.5;
+    }
+
+    .pub {
+      margin-bottom: 1.2rem;
+    }
+
+    .pub-title {
+      font-weight: 600;
+    }
+
+    .pub-authors {
+      color: var(--fg-dim);
+      font-size: 0.95rem;
+    }
+
+    .pub-venue {
+      font-style: italic;
+      color: var(--fg-dim);
+      font-size: 0.95rem;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    a:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .contact {
+      font-size: 0.95rem;
+      color: var(--fg-dim);
+    }
+
+    .contact a {
+      margin-right: 1.2rem;
+    }
+
+    footer {
+      margin-top: 4rem;
+      font-size: 0.8rem;
+      color: var(--rule);
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Your Name</h1>
+  <p class="tagline">PhD Student at [University] — figuring things out, one experiment at a time.</p>
+
+  <!-- About -->
+  <div class="section">
+    <div class="section-title">About</div>
+    <p class="bio">
+      Hi, I'm [Your Name]. I'm a researcher at [Lab / University], working on [brief description].
+      Previously I was at [previous affiliation].
+      I care about [something you care about beyond research].
+    </p>
+  </div>
+
+  <!-- Research Interests -->
+  <div class="section">
+    <div class="section-title">Research Interests</div>
+    <p class="interests">
+      keyword one, keyword two, keyword three, keyword four
+    </p>
+  </div>
+
+  <!-- Things I Believe -->
+  <div class="section">
+    <div class="section-title">Some Things I Believe</div>
+    <ul class="believe-list">
+      <li>Fail fast, Move fast</li>
+      <li>Good alone, Unstoppable together</li>
+      <li>Less is More</li>
+      <li>We can do more than we think</li>
+    </ul>
+  </div>
+
+  <!-- Publications -->
+  <div class="section">
+    <div class="section-title">Publications</div>
+
+    <div class="pub">
+      <div class="pub-title"><a href="https://arxiv.org/abs/XXXX.XXXXX">Paper Title Here</a></div>
+      <div class="pub-authors">Your Name, Co-Author A, Co-Author B</div>
+      <div class="pub-venue">Conference / Journal, 2025</div>
+    </div>
+
+    <div class="pub">
+      <div class="pub-title"><a href="https://arxiv.org/abs/XXXX.XXXXX">Another Paper Title</a></div>
+      <div class="pub-authors">Co-Author A, Your Name, Co-Author C</div>
+      <div class="pub-venue">Workshop on Something, 2024</div>
+    </div>
+
+    <!-- Add more <div class="pub">...</div> blocks as needed -->
+  </div>
+
+  <!-- Contact -->
+  <div class="section">
+    <div class="section-title">Contact</div>
+    <p class="contact">
+      <a href="mailto:you@example.com">email</a>
+      <a href="https://scholar.google.com/citations?user=XXXXX">google scholar</a>
+      <a href="https://github.com/yourusername">github</a>
+      <a href="https://x.com/yourusername">x / twitter</a>
+    </p>
+  </div>
+
+  <footer>&copy; 2025</footer>
+
+</body>
+</html>
