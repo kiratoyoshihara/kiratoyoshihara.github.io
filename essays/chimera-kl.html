@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Chimera Estimator — Kirato Yoshihara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --fg-dim: #6b6b6b;
+      --bg: #faf9f6;
+      --accent: #6495ED;
+      --rule: #d4d0c8;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 1.15rem;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Nav (same as main site) --- */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250,249,246,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 3rem;
+      gap: 2.5rem;
+    }
+    nav li a {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav li a:hover { color: var(--accent); }
+    nav li a.active { color: var(--fg); font-weight: 600; }
+
+    /* --- Article --- */
+    article {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 7rem 2rem 6rem;
+    }
+
+    .article-date {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .article-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0.3rem 0 0.2rem;
+    }
+    .article-subtitle {
+      color: var(--fg-dim);
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .article-author {
+      font-size: 0.95rem;
+      color: var(--fg-dim);
+      margin-bottom: 2.5rem;
+    }
+    .article-author a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .article-author a:hover { border-bottom-color: var(--accent); }
+
+    hr.section-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--fg-dim);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    p { margin-bottom: 1.2rem; }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    a:hover { border-bottom-color: var(--accent); }
+
+    figure {
+      margin: 2rem 0;
+    }
+    figure img {
+      width: 100%;
+      border-radius: 2px;
+    }
+    figcaption {
+      font-size: 0.88rem;
+      color: var(--fg-dim);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    pre {
+      background: #f0eeea;
+      border-radius: 3px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+    }
+
+    .citation-box {
+      background: #f0eeea;
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      border-radius: 0 3px 3px 0;
+      margin: 1.5rem 0;
+      user-select: all;
+    }
+
+    .back-link {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--fg-dim);
+      margin-bottom: 2rem;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .katex {
+      font-size: 0.95em;
+      font-weight: normal;
+    }
+
+    @media (max-width: 768px) {
+      nav ul { padding: 0.7rem 1.5rem; gap: 1.5rem; }
+      article { padding: 5rem 1.5rem 4rem; }
+      .article-title { font-size: 1.6rem; }
+    }
+
+    /* Allow figures to break out of the 640px column */
+    figure.wide {
+      width: 100vw;
+      max-width: 900px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+    figure.wide img { width: 100%; }
+  </style>
+</head>
+
+  <body>
+
+  <nav>
+    <ul>
+      <li><a href="/kiratoyoshihara.github.io/">Home</a></li>
+      <li><a href="/kiratoyoshihara.github.io/research">Research</a></li>
+      <li><a href="/kiratoyoshihara.github.io/essays" class="active">Essays</a></li>
+      <li><a href="/kiratoyoshihara.github.io/funfacts">Fun Facts</a></li>
+      <li><a href="/kiratoyoshihara.github.io/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <a href="/kiratoyoshihara.github.io/" class="back-link">← back</a>
+
+    <div class="article-date">April 2026</div>
+    <h1 class="article-title">The Chimera Estimator</h1>
+    <p class="article-subtitle">What if we used k₃ going forward and k₁ going backward?</p>
+    <p class="article-author">
+      <a href="/kiratoyoshihara.github.io/">Kirato Yoshihara</a>
+    </p>
+
+    <h2>Background</h2>
+    <p>
+      In 2020, John Schulman wrote a lovely <a href="http://joschu.net/blog/kl-approx.html">blog post</a> about Monte Carlo estimators for KL divergence. The setup is simple: you have samples from <span class="katex-inline">q</span>, you can evaluate both <span class="katex-inline">\log p(x)</span> and <span class="katex-inline">\log q(x)</span>, and you want to estimate <span class="katex-inline">\text{KL}[q \| p]</span>. He compared three estimators, all functions of the ratio <span class="katex-inline">r = p(x)/q(x)</span>:
+    </p>
+    <p>
+      <span class="katex-inline">\boldsymbol{k_1 = \log r}</span> — the naive estimator. Unbiased, but half the samples come out negative even though KL is always positive. High variance.
+    </p>
+    <p>
+      <span class="katex-inline">\boldsymbol{k_2 = \tfrac{1}{2}(\log r)^2}</span> — biased but remarkably low variance. It's an <a href="https://en.wikipedia.org/wiki/F-divergence">f-divergence</a> that agrees with KL up to second order when <span class="katex-inline">p \approx q</span>.
+    </p>
+    <p>
+      <span class="katex-inline">\boldsymbol{k_3 = (r - 1) - \log r}</span> — the star of the post. Unbiased, always non-negative, and low variance. It measures the gap between <span class="katex-inline">\log(x)</span> and its tangent line, which is a <a href="https://en.wikipedia.org/wiki/Bregman_divergence">Bregman divergence</a>. Schulman showed it has roughly the same standard deviation as <span class="katex-inline">k_2</span> while being unbiased — strictly better.
+    </p>
+    <p>
+      The post is clean and the conclusion seems definitive: just use <span class="katex-inline">k_3</span>. But there's a catch that only shows up when you actually optimize with it.
+    </p>
+
+    <h2>The Math - Problem with k₃ in High Dimensions</h2>
+    <p>
+      Schulman's analysis focused on the <em>forward</em> properties of each estimator — bias and variance of the estimated value. That's the right thing to care about if you're using KL as a diagnostic. But if you're using it as a <em>loss function</em> and optimizing with gradient descent, what matters is the variance of the gradients.
+    </p>
+    <p>
+      Let's look at the gradients. For <span class="katex-inline">k_1 = \log r</span>, the gradient with respect to the parameters of <span class="katex-inline">p</span> is simply <span class="katex-inline">\nabla \log p(x)</span> — no dependence on <span class="katex-inline">r</span>. For <span class="katex-inline">k_3 = (r-1) - \log r</span>, the gradient picks up a factor of <span class="katex-inline">(r - 1)</span>:
+    </p>
+    <p style="text-align: center;">
+      <span class="katex-inline">\nabla k_3 = (r - 1) \, \nabla \log p(x)</span>
+    </p>
+    <p>
+      Here's the problem. In a <span class="katex-inline">D</span>-dimensional setting with factorized distributions, <span class="katex-inline">\log r = \sum_{d=1}^{D} \log \frac{p_d(x_d)}{q_d(x_d)}</span>, so <span class="katex-inline">r = \exp(\text{sum of } D \text{ terms})</span>. Even when each term is small, the sum grows with <span class="katex-inline">D</span>, and the exponential makes <span class="katex-inline">r</span> fluctuate wildly. The factor <span class="katex-inline">(r-1)</span> injects this noise directly into the gradient.
+    </p>
+    <p>
+      The result is that the variance of <span class="katex-inline">\nabla k_3</span> grows exponentially with dimension, while <span class="katex-inline">\nabla k_1</span> stays flat. In our experiments with <span class="katex-inline">p = \mathcal{N}(\mu, I)</span> and <span class="katex-inline">q = \mathcal{N}(0, I)</span> at <span class="katex-inline">\mu = 0.05</span>, the gradient variance of <span class="katex-inline">k_3</span> goes from <span class="katex-inline">10^{-4}</span> at <span class="katex-inline">D=1</span> to <span class="katex-inline">10^{14}</span> at <span class="katex-inline">D=5000</span>. That's not a usable gradient.
+    </p>
+
+    <h2>The Chimera Estimator</h2>
+    <p>
+      So <span class="katex-inline">k_3</span> has the better forward value (non-negative, unbiased, low variance) and <span class="katex-inline">k_1</span> has the better gradient (no <span class="katex-inline">r</span> factor, stable across dimensions). The natural question: can we get both?
+    </p>
+    <p>
+      Yes, with a one-line trick. Define:
+    </p>
+    <p style="text-align: center;">
+      <span class="katex-inline">\mathcal{L}_{\text{chimera}} = \text{sg}(k_3) + k_1 - \text{sg}(k_1)</span>
+    </p>
+    <p>
+      where <span class="katex-inline">\text{sg}(\cdot)</span> denotes the stop-gradient operator (i.e. <code>.detach()</code> in PyTorch). Let's verify this does what we want:
+    </p>
+    <p>
+      <em>Forward pass:</em> <span class="katex-inline">\text{sg}(k_3)</span> evaluates to <span class="katex-inline">k_3</span>, and the <span class="katex-inline">k_1 - \text{sg}(k_1)</span> terms cancel to zero. So the loss value equals <span class="katex-inline">k_3</span>.
+    </p>
+    <p>
+      <em>Backward pass:</em> <span class="katex-inline">\text{sg}(k_3)</span> has zero gradient, and <span class="katex-inline">\text{sg}(k_1)</span> is a constant. Therefore, what remains is <span class="katex-inline">\nabla k_1</span>.
+    </p>
+    <p>
+      In PyTorch, this is:
+    </p>
+    <pre>
+    loss_k1 = log_r.mean()
+    loss_k3 = (r - 1.0 - log_r).mean()
+    loss = loss_k3.detach() + loss_k1 - loss_k1.detach()</pre>
+    <p>
+      The trick itself is nothing exotic — stop-gradient is used all over the place in reinforcement learning baselines and contrastive learning. The point here is just that it's the right tool for this particular problem, and it cleanly separates the forward and backward behavior of a KL estimator.
+    </p>
+
+    <h2>Experiments</h2>
+    <p>
+      We test with a simple setup: <span class="katex-inline">p = \mathcal{N}(\mu, I)</span> and <span class="katex-inline">q = \mathcal{N}(0, I)</span> in <span class="katex-inline">D</span> dimensions, with <span class="katex-inline">\mu</span> initialized at <span class="katex-inline">0.05</span>. The true KL is <span class="katex-inline">\tfrac{1}{2}\|\mu\|^2</span>, so the optimum is at <span class="katex-inline">\mu = 0</span>. We sample with the <a href="https://en.wikipedia.org/wiki/Reparameterization_trick">reparameterization trick</a> using a batch size of 32.
+    </p>
+    <p>
+      <em>Experiment 1: Gradient variance.</em> <br> For each dimensionality <span class="katex-inline">D \in \{1, 10, 50, 100, 500, 1000, 2000, 5000\}</span>, we compute the gradient of each estimator 300 times from a fixed parameter and measure the variance across trials. No optimization is performed — this isolates the noise in the gradient signal itself.
+    </p>
+
+    <figure>
+      <img src="/kiratoyoshihara.github.io/essays/assets/chimera-kl/kl_variance_plot.png" alt="Gradient variance comparison across dimensionality">
+      <figcaption>Figure 1 — Gradient variance vs. dimensionality. <span class="katex-inline">k_1</span> and Chimera stay flat at ~0.03, while <span class="katex-inline">k_3</span> explodes from <span class="katex-inline">10^{-4}</span> to <span class="katex-inline">10^{14}</span>.</figcaption>
+    </figure>
+
+    <p>
+    From Figure 1, the gradient variance of <span class="katex-inline">k_3</span> grows exponentially with dimension — roughly 18 orders of magnitude from <span class="katex-inline">D=1</span> to <span class="katex-inline">D=5000</span>. Meanwhile, <span class="katex-inline">k_1</span> and Chimera remain essentially constant at ~0.031, completely independent of <span class="katex-inline">D</span>. This confirms that the <span class="katex-inline">(r-1)</span> factor in <span class="katex-inline">\nabla k_3</span> is the sole source of the instability, and that Chimera successfully avoids it.
+    </p>
+
+    <p>
+      <em>Experiment 2: Training dynamics.</em> <br> We optimize <span class="katex-inline">\mu</span> with Adam (lr=0.02) for 2000 steps, tracking the empirical KL loss. We run this for <span class="katex-inline">D \in \{10, 100, 500, 1000, 2000, 5000\}</span>.
+    </p>
+
+    <figure>
+      <img src="/kiratoyoshihara.github.io/essays/assets/chimera-kl/kl_phase_transition.png" alt="Training curves across dimensions">
+      <figcaption>Figure 2 — Training curves. At low dimensions all three estimators converge. Around <span class="katex-inline">D = 500</span>~<span class="katex-inline">1000</span>, <span class="katex-inline">k_3</span> begins to diverge. By <span class="katex-inline">D = 5000</span>, <span class="katex-inline">k_3</span> is stuck at a high loss while <span class="katex-inline">k_1</span> and Chimera converge to zero.</figcaption>
+    </figure>
+
+    <p>
+      The results match the prediction: at high dimensions where <span class="katex-inline">k_3</span> diverges, Chimera converges reliably thanks to inheriting the stable gradients of <span class="katex-inline">k_1</span>. At low dimensions, <span class="katex-inline">k_3</span> actually has <em>lower</em> gradient variance and converges faster — Chimera pays a small cost there by using the noisier <span class="katex-inline">k_1</span> gradient. The tradeoff favors Chimera when <span class="katex-inline">D</span> is large enough for <span class="katex-inline">k_3</span> to become unstable. The code for all experiments is available on <a href="https://github.com/kiratoyoshihara/Chimera-Estimator/tree/main">GitHub</a>.
+    </p>
+
+
+    <h2>Discussion</h2>
+    <p>
+      Let's be honest about what Chimera is and isn't. The stop-gradient trick that makes it work is well-known, and the fact that the forward value equals <span class="katex-inline">k_3</span> is immediate from the construction — there's no deep insight there. What's new is the observation that <span class="katex-inline">k_3</span>'s gradient variance blows up in high dimensions, and that this specific decomposition fixes it.
+    </p>
+    <p>
+      There are also clear limitations. In low dimensions, <span class="katex-inline">k_3</span> is strictly better — its gradient variance is lower than <span class="katex-inline">k_1</span>'s, and it converges faster. Chimera only becomes worth using once <span class="katex-inline">D</span> is large enough for the <span class="katex-inline">(r-1)</span> factor to cause trouble. In our setup, that transition happens somewhere around <span class="katex-inline">D = 100</span>~<span class="katex-inline">500</span>.
+    </p>
+    <p>
+      Where might this matter in practice? Any setting where KL divergence is optimized as a loss in high-dimensional parameter spaces: VAEs with large latent spaces, policy optimization in reinforcement learning with high-dimensional action spaces, or distillation objectives between large models. In all of these, the gradient is what drives learning, and an estimator that looks good on paper but produces unusable gradients is not actually good.
+    </p>
+    <p>
+      A natural next step would be an adaptive version — use <span class="katex-inline">k_3</span> gradients when <span class="katex-inline">D</span> is small and switch to Chimera when variance exceeds a threshold. We leave this for future work :)
+    </p>
+
+    <h2>Citation</h2>
+    <div class="citation-box">
+    @misc{yoshihara2026chimera,<br>
+    &nbsp;&nbsp;title={The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions},<br>
+    &nbsp;&nbsp;author={Kirato Yoshihara},<br>
+    &nbsp;&nbsp;year={2026},<br>
+    &nbsp;&nbsp;url={https://kiratoyoshihara.github.io/essays/chimera-kl.html}<br>
+    }
+    </div>
+
+  </article>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="document.querySelectorAll('.katex-inline').forEach(el => katex.render(el.textContent, el, {throwOnError: false}));"></script>
+</body>
+</html>

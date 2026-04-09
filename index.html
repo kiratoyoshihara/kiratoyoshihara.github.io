@@ -161,6 +161,24 @@
       margin-bottom: 0;
       font-weight: 600;
     }
+    .essay-item {
+      margin-bottom: 2rem;
+    }
+    .essay-item .essay-date {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+      letter-spacing: 0.04em;
+    }
+    .essay-item .essay-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .essay-item .essay-desc {
+      color: var(--fg-dim);
+      font-size: 1rem;
+      margin-top: 0.2rem;
+    }
   </style>
 </head>
 <body>
@@ -169,6 +187,7 @@
     <ul>
       <li><a class="nav-link active" data-page="home">Home</a></li>
       <li><a class="nav-link" data-page="research">Research</a></li>
+      <li><a class="nav-link" data-page="essays">Essays</a></li>
       <li><a class="nav-link" data-page="funfacts">Fun Facts</a></li>
       <li><a class="nav-link" data-page="contact">Contact</a></li>
     </ul>
@@ -205,6 +224,19 @@
           <div class="pub-title"><a href="https://arxiv.org/abs/2602.23782">Breaking the Data Barrier: Robust Few-Shot 3D Vessel Segmentation using Foundation Models</a></div>
           <div class="pub-authors">Kirato Yoshihara, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
           <div class="pub-venue">Under Review MICCAI 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-essays">
+    <div class="page-content">
+      <div class="section">
+        <div class="section-title">Essays</div>
+        <div class="essay-item">
+          <div class="essay-date">April 2026</div>
+          <div class="essay-title"><a href="essays/chimera-kl.html">The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions</a></div>
+          <div class="essay-desc">Schulman's k3 estimator has nice forward properties but exploding gradient variance. What if we use k3 for the forward pass and k1 for the backward?</div>
         </div>
       </div>
     </div>
@@ -354,16 +386,12 @@ function buildUR5e(){
   for(var k=0;k<all.length;k++){all[k].x-=ccx;all[k].y-=ccy;}
   return all;
 }
-
-/* --- Coffee cup: cylinder body + handle torus arc --- */
 function buildCoffeeCup(){
   var white={r:210,g:205,b:195};
   var brown={r:90,g:50,b:20};
   var darkGrey={r:20,g:20,b:20};
   var all=[];
   var d=1300;
-
-  // Cup body: cylinder, wider at top
   var bodyH=0.5, botR=0.22, topR=0.26;
   for(var i=0;i<d*1.5;i++){
     var t=Math.random();
@@ -371,13 +399,11 @@ function buildCoffeeCup(){
     var r=botR+(topR-botR)*t;
     all.push({x:Math.cos(th)*r, y:t*bodyH, z:Math.sin(th)*r, col:white});
   }
-  // Bottom disc
   for(var i=0;i<d*0.4;i++){
     var th=Math.random()*Math.PI*2;
     var r=Math.random()*botR;
     all.push({x:Math.cos(th)*r, y:0, z:Math.sin(th)*r, col:white});
   }
-  // Coffee surface (brown disc near top)
   var coffeeY=bodyH*0.85;
   var coffeeR=botR+(topR-botR)*0.85-0.01;
   for(var i=0;i<d*0.5;i++){
@@ -385,13 +411,11 @@ function buildCoffeeCup(){
     var r=Math.random()*coffeeR;
     all.push({x:Math.cos(th)*r, y:coffeeY, z:Math.sin(th)*r, col:brown});
   }
-  // Rim (top ring, slightly thicker)
   for(var i=0;i<d*0.3;i++){
     var th=Math.random()*Math.PI*2;
     var rr=topR+(Math.random()-0.5)*0.015;
     all.push({x:Math.cos(th)*rr, y:bodyH, z:Math.sin(th)*rr, col:white});
   }
-  // Handle: C-shaped arc attached to the cup side
   var handleTop=bodyH*0.75;
   var handleBot=bodyH*0.3;
   var handleMidY=(handleTop+handleBot)/2;
@@ -400,7 +424,6 @@ function buildCoffeeCup(){
   var handleDepth=0.14;
   var tubeR=0.025;
   for(var i=0;i<d*0.6;i++){
-    // Arc from -PI/2 to PI/2 (C shape on the right side)
     var a=-Math.PI/2+Math.random()*Math.PI;
     var hx=cupRadAtMid+handleDepth*Math.cos(a);
     var hy=handleMidY+handleHalfH*Math.sin(a);
@@ -409,7 +432,6 @@ function buildCoffeeCup(){
     var tz=Math.sin(tth)*tubeR;
     all.push({x:hx+tx, y:hy, z:tz, col:white});
   }
-  // Saucer: flat disc below cup
   var saucerY=-0.03;
   for(var i=0;i<d*0.6;i++){
     var th=Math.random()*Math.PI*2;
@@ -417,14 +439,11 @@ function buildCoffeeCup(){
     var h=(Math.random()-0.5)*0.02;
     all.push({x:Math.cos(th)*r, y:saucerY+h, z:Math.sin(th)*r, col:darkGrey});
   }
-  // Saucer rim
   for(var i=0;i<d*0.2;i++){
     var th=Math.random()*Math.PI*2;
     var r=0.37+(Math.random()-0.5)*0.02;
     all.push({x:Math.cos(th)*r, y:saucerY, z:Math.sin(th)*r, col:darkGrey});
   }
-
-  // Center
   var minY=Infinity,maxY=-Infinity,minX=Infinity,maxX=-Infinity;
   for(var k=0;k<all.length;k++){var p=all[k];if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;}
   var ccx=(minX+maxX)/2,ccy=(minY+maxY)/2;
@@ -441,7 +460,6 @@ function project(x,y,z,rY,rX,s){
 var pts3d=[],particles=[],startTime=0,isCoffee=false;
 var DENOISE=4000,HOLD=5000,DISSOLVE=4000,PAUSE=100,TOTAL=DENOISE+HOLD+DISSOLVE+PAUSE;
 function initCycle(){
-  // 15% chance of coffee cup easter egg
   isCoffee=Math.random()<0.15;
   if(isCoffee){
     pts3d=buildCoffeeCup();
