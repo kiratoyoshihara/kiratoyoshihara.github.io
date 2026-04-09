@@ -297,6 +297,7 @@ document.querySelectorAll('.nav-link').forEach(function(link){
     document.getElementById('page-' + target).classList.add('active');
     this.classList.add('active');
     window.scrollTo(0, 0);
+    if (target === 'home') { resize(); initCycle(); }
   });
 });
 
@@ -317,6 +318,21 @@ function resize() {
 }
 resize();
 window.addEventListener('resize', resize);
+
+window.addEventListener('hashchange', function() {
+  var id = location.hash.replace('#', '');
+  var page = document.getElementById(id);
+  if (page) {
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
+    page.classList.add('active');
+    var target = id.replace('page-', '');
+    var link = document.querySelector('[data-page="' + target + '"]');
+    if (link) link.classList.add('active');
+    if (target === 'home') { resize(); initCycle(); }
+  }
+});
+if (location.hash) window.dispatchEvent(new Event('hashchange'));
 
 function sampleLink(p1,p2,radius,count){
   var pts=[];
