@@ -330,6 +330,7 @@ window.addEventListener('hashchange', function() {
     var link = document.querySelector('[data-page="' + target + '"]');
     if (link) link.classList.add('active');
     if (target === 'home') { resize(); initCycle(); }
+    history.replaceState(null, '', window.location.pathname);
   }
 });
 if (location.hash) window.dispatchEvent(new Event('hashchange'));
