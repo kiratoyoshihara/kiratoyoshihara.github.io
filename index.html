@@ -477,7 +477,7 @@ function project(x,y,z,rY,rX,s){
 var pts3d=[],particles=[],startTime=0,isCoffee=false;
 var DENOISE=4000,HOLD=5000,DISSOLVE=4000,PAUSE=100,TOTAL=DENOISE+HOLD+DISSOLVE+PAUSE;
 function initCycle(){
-  isCoffee=Math.random()<0.15;
+  isCoffee=Math.random()<0.1;
   if(isCoffee){
     pts3d=buildCoffeeCup();
   }else{
