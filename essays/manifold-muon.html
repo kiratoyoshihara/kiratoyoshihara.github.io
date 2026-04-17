@@ -1327,6 +1327,20 @@
   Our work sits within a broader trend of exploiting matrix structure in neural network optimization. ASGO <a href="#ref-asgo">[13]</a> uses the low-rank structure of gradients and the block-diagonal structure of Hessians to build adaptive preconditioners, achieving faster convergence than Adam on standard benchmarks. The connection to our work is indirect but conceptual: DGram's per-column scale freedom can be viewed as a learned diagonal preconditioner on the column space, and the fact that this freedom helps MLPs but hurts attention suggests that the right preconditioning structure is layer-dependent. Bernstein's Modula project <a href="#ref-manifold-muon">[3]</a> formalizes this intuition through the theory of modular manifolds, which composes per-layer manifold constraints with per-layer norm choices to build a coherent optimizer for the whole network. Our experiments test heterogeneous manifold assignments on a transformer, combining Bernstein's optimization framework with Keigwin's Gram-space taxonomy to ask which manifold suits which layer. We are not aware of prior work that compares multiple manifold assignments within a single architecture, though we have not done an exhaustive survey.
 </p>
 
+<h2>Conclusion</h2>
+
+<p>
+  We scaled Bernstein's Manifold Muon to GPT-2 pretraining and tested five manifold assignments across attention and MLP layers. Two practical findings made this possible: the dual ascent step size needs to be roughly <span class="katex-inline">0.003 \cdot n^{0.67}</span> rather than the default 0.01, and the retraction absorbs most of the error from an early-stopped dual ascent, so 20 inner iterations suffice in practice.
+</p>
+
+<p>
+  The central finding is that the direction of the manifold assignment matters. Placing DGram on attention causes training to diverge in both conditions where it was tested (All DGram at step 16000, Hetero-inv at step 20000), while placing Stiefel on attention keeps training stable. The reverse is also true in a weaker sense: DGram on MLPs gives a small advantage over Stiefel on MLPs, and the heterogeneous assignment (Stiefel attention, DGram MLP) achieves the best validation loss of any condition. The softmax Jacobian analysis in Section 5 explains the asymmetry: DGram's unbounded singular values inflate the attention logits, saturating the softmax and collapsing the gradient, while the same freedom is harmless in MLPs where no global normalization bottleneck exists.
+</p>
+
+<p>
+  The manifold assignment problem, formulated in Section 8 as a bi-criterion optimization over gradient non-degeneracy and expressiveness, is open. We hope this post provides useful empirical grounding and a concrete theoretical starting point for further work on geometry-aware transformer training.
+</p>
+
 <h2>Limitations and future work</h2>
 
 <h3>Experimental limitations</h3>
