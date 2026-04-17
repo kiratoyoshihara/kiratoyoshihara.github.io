@@ -648,7 +648,7 @@
 
 <figure style="margin: 1.5em auto;">
   <img src="assets/manifold-muon/architecture-muon.svg" alt="GPT-2 architecture diagram showing attention projections in orange, MLP projections in blue, and remaining parameters in gray." 
-    style="display: block; margin: 0 auto; max-width: 100%; max-height: 500px; background-color: #faf9f6;">
+    style="display: block; margin: 0 auto; max-width: 100%; max-height: 500px; background-color: #faf9f6; filter: none !important; color-scheme: light;">
   <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
     Figure 4: GPT-2 small architecture with the Hetero manifold assignment. Attention projections (orange) are constrained to the Stiefel manifold. MLP projections (blue) are constrained to the DGram manifold. Token embeddings, positional embeddings, LayerNorm parameters, and the language modeling head (gray) are trained with AdamW. The other four conditions in Table 3 have the same skeleton, with different manifolds attached to the orange and blue blocks.
   </figcaption>
