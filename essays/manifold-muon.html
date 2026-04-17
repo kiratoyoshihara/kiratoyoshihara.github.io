@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modular Manifolds — Kirato Yoshihara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --fg-dim: #6b6b6b;
+      --bg: #faf9f6;
+      --accent: #6495ED;
+      --rule: #d4d0c8;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 1.15rem;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Nav (same as main site) --- */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250,249,246,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 3rem;
+      gap: 2.5rem;
+    }
+    nav li a {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav li a:hover { color: var(--accent); }
+    nav li a.active { color: var(--fg); font-weight: 600; }
+
+    /* --- Article --- */
+    article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 7rem 2rem 6rem;
+    }
+
+    .article-date {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .article-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0.3rem 0 0.2rem;
+    }
+    .article-subtitle {
+      color: var(--fg-dim);
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .article-author {
+      font-size: 0.95rem;
+      color: var(--fg-dim);
+      margin-bottom: 2.5rem;
+    }
+    .article-author a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .article-author a:hover { border-bottom-color: var(--accent); }
+
+    hr.section-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--fg-dim);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    p { margin-bottom: 1.2rem; }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    a:hover { border-bottom-color: var(--accent); }
+
+    figure {
+      margin: 2rem 0;
+    }
+    figure img {
+      width: 100%;
+      border-radius: 2px;
+    }
+    figcaption {
+      font-size: 0.88rem;
+      color: var(--fg-dim);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    pre {
+      background: #f0eeea;
+      border-radius: 3px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+    }
+
+    .citation-box {
+      background: #f0eeea;
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      border-radius: 0 3px 3px 0;
+      margin: 1.5rem 0;
+      user-select: all;
+    }
+
+    .back-link {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--fg-dim);
+      margin-bottom: 2rem;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .katex {
+      font-size: 0.95em;
+      font-weight: normal;
+    }
+
+    @media (max-width: 768px) {
+      nav ul { padding: 0.7rem 1.5rem; gap: 1.5rem; }
+      article { padding: 5rem 1.5rem 4rem; }
+      .article-title { font-size: 1.6rem; }
+    }
+
+    /* Allow figures to break out of the 640px column */
+    figure.wide {
+      width: 100vw;
+      max-width: 900px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+    figure.wide img { width: 100%; }
+  </style>
+</head>
+
+  <body>
+
+  <article>
+    <a href="../index.html#page-essays"" class="back-link">← back</a>
+
+    <div class="article-date">4/17 2026</div>
+    <h1 class="article-title">Different Layers, Different Manifolds: Scaling Manifold Muon to GPT-2</h1>
+    <p class="article-subtitle">Manifold Muon constrains weights to have nice spectral properties. But which manifold should each layer live on? We tried five assignments on GPT-2 and only three survived.</p>
+    <p class="article-author">
+      <a href="/kiratoyoshihara.github.io/">Kirato Yoshihara</a>
+    </p>
+
+    <figure style="margin: 2.5rem 0;">
+      <div id="manifold-hero" style="display: flex; justify-content: center; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px; max-width: 300px; text-align: center;">
+          <div id="stiefel-canvas" style="width: 100%; height: 280px;"></div>
+          <div style="font-family: var(--mono); font-size: 0.82rem; color: #2d9a5f; margin-top: 0.3rem; letter-spacing: 0.05em;">Stiefel (Orthonormal)</div>
+        </div>
+        <div style="flex: 1; min-width: 240px; max-width: 300px; text-align: center;">
+          <div id="dgram-canvas" style="width: 100%; height: 280px;"></div>
+          <div style="font-family: var(--mono); font-size: 0.82rem; color: #4a9fbf; margin-top: 0.3rem; letter-spacing: 0.05em;">DGram (Orthogonal)</div>
+        </div>
+      </div>
+    </figure>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+    (function() {
+      const config = {
+        bgColor: 0xfaf9f6,            // match blog background
+        pointColor: 0x1a1a1a,          // dark dot against pale manifolds
+        speed: 0.0005,
+        // Unified trail color across both panels so the eye reads them as one family
+        trailColor: 0x1a1a1a,
+      };
+
+      // Scene factory — camera pulled back so spheres never clip
+      function createScene(containerId) {
+        const container = document.getElementById(containerId);
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(config.bgColor);
+
+        const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
+        camera.position.set(4.2, 2.4, 4.2);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Soft lighting — saturated enough to show the manifold color clearly
+        scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        keyLight.position.set(5, 5, 5);
+        scene.add(keyLight);
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        fillLight.position.set(-5, -3, -5);
+        scene.add(fillLight);
+
+        return { scene, camera, renderer, container };
+      }
+
+      // Drag-to-rotate with touch fallback
+      function addInteractivity(setup, rotatingGroup) {
+        let isDragging = false;
+        let prev = { x: 0, y: 0 };
+
+        const onDown = (x, y) => { isDragging = true; prev.x = x; prev.y = y; };
+        const onMove = (x, y) => {
+          if (!isDragging) return;
+          rotatingGroup.rotation.y += (x - prev.x) * 0.01;
+          rotatingGroup.rotation.x += (y - prev.y) * 0.01;
+          prev.x = x; prev.y = y;
+        };
+        const onUp = () => { isDragging = false; };
+
+        setup.container.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
+        window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+        window.addEventListener('mouseup', onUp);
+        setup.container.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+        });
+        window.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+        });
+        window.addEventListener('touchend', onUp);
+      }
+
+      // Single smooth manifold surface — no wireframe, no grid
+      // Opacity is higher now (0.7) so the color reads properly without looking washed out
+      function buildManifold(group, color, radius, scale) {
+        const geom = new THREE.SphereGeometry(radius, 64, 64);
+        geom.scale(scale[0], scale[1], scale[2]);
+        const mat = new THREE.MeshPhongMaterial({
+          color: color,
+          transparent: true,
+          opacity: 0.5,
+          shininess: 40,
+        });
+        group.add(new THREE.Mesh(geom, mat));
+      }
+
+      // Parametric point on manifold surface at parameter t ∈ [0, 1)
+      function manifoldPoint(t, radius, scale, phaseOffset) {
+        const theta = t * Math.PI * 10.0 + (phaseOffset || 0);
+        const phi = Math.PI * 0.3 + (Math.sin(t * Math.PI * 12) * 0.5 + 0.5) * Math.PI * 0.5;
+        const dx = Math.sin(phi) * Math.cos(theta);
+        const dy = Math.cos(phi);
+        const dz = Math.sin(phi) * Math.sin(theta);
+        const sx = scale[0], sy = scale[1], sz = scale[2];
+        const r = radius / Math.sqrt((dx/sx)**2 + (dy/sy)**2 + (dz/sz)**2);
+        return new THREE.Vector3(r * dx, r * dy, r * dz);
+      }
+
+      // Animated point with colored trail that fades newest -> oldest
+      // Both panels share the same trail color for visual unity
+      function createAnimatedPoint(group, radius, scale, pointSize, phaseOffset) {
+        const pointGeom = new THREE.SphereGeometry(pointSize, 20, 20);
+        const pointMat = new THREE.MeshBasicMaterial({ color: config.pointColor });
+        const point = new THREE.Mesh(pointGeom, pointMat);
+        group.add(point);
+
+        const trailLength = 500;
+        const trailPositions = new Float32Array(trailLength * 3);
+        const trailColors = new Float32Array(trailLength * 3);
+        const trailGeom = new THREE.BufferGeometry();
+        trailGeom.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+        trailGeom.setAttribute('color', new THREE.BufferAttribute(trailColors, 3));
+        const trailMat = new THREE.LineBasicMaterial({
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.9,
+        });
+        const trail = new THREE.Line(trailGeom, trailMat);
+        group.add(trail);
+
+        const baseColor = new THREE.Color(config.trailColor);
+        const history = [];
+        let t = 0;
+
+        return function update() {
+          t = (t + config.speed) % 1;
+          const pos = manifoldPoint(t, radius, scale, phaseOffset);
+          point.position.copy(pos);
+
+          history.unshift(pos.clone());
+          if (history.length > trailLength) history.pop();
+
+          // Fade newer segments (vivid) to older (pale, dissolving into bg)
+          for (let i = 0; i < history.length; i++) {
+            trailPositions[i * 3]     = history[i].x;
+            trailPositions[i * 3 + 1] = history[i].y;
+            trailPositions[i * 3 + 2] = history[i].z;
+
+            const fade = 1 - (i / trailLength) * 0.75;
+            trailColors[i * 3]     = baseColor.r * fade + (1 - fade);
+            trailColors[i * 3 + 1] = baseColor.g * fade + (1 - fade);
+            trailColors[i * 3 + 2] = baseColor.b * fade + (1 - fade);
+          }
+          if (history.length > 0) {
+            const last = history[history.length - 1];
+            for (let i = history.length; i < trailLength; i++) {
+              trailPositions[i * 3]     = last.x;
+              trailPositions[i * 3 + 1] = last.y;
+              trailPositions[i * 3 + 2] = last.z;
+              trailColors[i * 3] = 1; trailColors[i * 3 + 1] = 1; trailColors[i * 3 + 2] = 1;
+            }
+          }
+          trailGeom.attributes.position.needsUpdate = true;
+          trailGeom.attributes.color.needsUpdate = true;
+        };
+      }
+
+      function buildStiefel() {
+        const setup = createScene('stiefel-canvas');
+        const group = new THREE.Group();
+        setup.scene.add(group);
+
+        buildManifold(group, 0x2d9a5f, 1, [1, 1, 1]);
+        const updatePoint = createAnimatedPoint(group, 1.01, [1, 1, 1], 0.065, 0);
+
+        addInteractivity(setup, group);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          updatePoint();
+          setup.renderer.render(setup.scene, setup.camera);
+        }
+        animate();
+      }
+
+      function buildDGram() {
+        const setup = createScene('dgram-canvas');
+        const group = new THREE.Group();
+        setup.scene.add(group);
+
+        const scale = [1.25, 0.78, 1.05];
+        buildManifold(group, 0x4a9fbf, 1, scale);
+        const updatePoint = createAnimatedPoint(group, 1.01, scale, 0.065, 0);
+
+        addInteractivity(setup, group);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          updatePoint();
+          setup.renderer.render(setup.scene, setup.camera);
+        }
+        animate();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          buildStiefel();
+          buildDGram();
+        });
+      } else {
+        buildStiefel();
+        buildDGram();
+      }
+    })();
+    </script>
+
+    <h2>Background</h2>
+    <p>
+      <a href="#ref-muon">Muon [1]</a> has become one of the most interesting optimizers of the past two years. The idea is simple: at every step, take the gradient matrix, compute its matrix sign (via Newton–Schulz iterations), and use that as the update direction. The matrix sign snaps all singular values to 1, which means every spectral direction gets the same treatment, with no direction preferred over another. This turns out to work remarkably well for training transformers, and <a href="#ref-moonshot">Moonshot's team [2]</a> showed it scales to trillion-parameter models.
+    </p>
+
+    <p>
+      But there's a question Muon doesn't answer. If we're going to orthogonalize the update, why not just enforce orthogonality on the weights themselves? That's the natural thing to do if you believe spectral balance is important. Rather than fixing the singular values of the update at every step, constrain the weights to live on a manifold where they already have the property you want.
+    </p>
+
+    <p>
+      This is exactly what <a href="#ref-manifold-muon">Bernstein's Manifold Muon [3]</a> does. The weights are constrained to a matrix manifold (the Stiefel manifold, where columns are orthonormal), and the optimizer solves a constrained optimization problem at every step: find the update that maximally decreases the loss subject to staying on the manifold. The solution involves a dual ascent procedure to find the right Lagrange multiplier, followed by a retraction back onto the manifold using msign. It's a beautiful piece of optimization, turning an implicit property (update orthogonalization) into an explicit structural constraint on the weight space.
+    </p>
+
+    <p>
+      Bernstein demonstrated that Manifold Muon works on CIFAR-10 with small MLPs. But two questions were left open:
+    </p>
+
+    <p>
+      <strong>Does it scale to transformers?</strong> The dual ascent procedure has hyperparameters (step size α, number of iterations) that were tuned for small matrices. Whether these choices transfer to the 768×768 matrices of GPT-2 is not obvious.
+    </p>
+
+    <p>
+      <strong>Which manifold is right for which layer?</strong> The Stiefel manifold is one choice, but it's not the only one. <a href="#ref-gram-space">Keigwin's Gram-space [4]</a> work suggests a weaker constraint, the DGram manifold, where <span class="katex-inline">W^\top W = I</span> but individual singular values can vary, might be preferable in some settings. The Oblique manifold, where each column has unit norm but columns aren't required to be orthogonal, is yet another option. Transformers have qualitatively different layers: attention projections (Q, K, V, O) and MLPs (up-projection, down-projection). There's no a priori reason they should want the same geometry.
+    </p>
+
+    <p>
+      This post is about trying to answer both questions. We scale Manifold Muon to GPT-2 (124M parameters) pretraining on <a href="#ref-nanogpt">OpenWebText [5]</a>, and we test five different manifold assignments, varying what constraint each layer's weights live under. The headline result is that the answer to the second question is <em>no, different layers don't want the same manifold</em>: attention layers train stably on Stiefel but diverge on DGram, while MLPs prefer DGram. A heterogeneous assignment (Stiefel on attention, DGram on MLPs) outperforms every uniform choice.
+    </p>
+
+    <p>
+      Along the way, we also find that the dual ascent step size α needs to be scaled up by roughly 10 to 20 times from Bernstein's default when moving to 768×768 matrices, not because it fails to converge at small α, but because convergence becomes impractically slow. And we observe something that makes the whole thing computationally feasible: the retraction step absorbs most of the error from an under-converged dual ascent, so 20 iterations is enough in practice despite theory suggesting you'd want many more.
+    </p>
+
+    <h2>Scaling the dual ascent to 768x768</h2>
+
+    <p>
+      Bernstein's reference implementation uses <span class="katex-inline">\alpha = 0.01</span> and 100 dual ascent iterations, tuned against a 3-layer MLP on CIFAR-10. The weight matrices of that MLP, after the transposition that <a href="#ref-manifold-muon-implementation">manifold_muon [6]</a> applies internally, give dual ascent problems on <span class="katex-inline">n \times n</span> matrices with <span class="katex-inline">n \in \{10, 64, 128\}</span>. Transformer weight matrices are substantially larger. For GPT-2 small, the attention and MLP projection matrices produce dual ascent problems at <span class="katex-inline">n = 768</span>. Whether Bernstein's <span class="katex-inline">\alpha = 0.01</span> remains a reasonable choice at this scale is an empirical question, so we asked it.
+    </p>
+
+    <p>
+      We ran dual ascent on random Gaussian <span class="katex-inline">(W, G)</span> pairs, where <span class="katex-inline">W \in \mathbb{R}^{n \times n}</span> is the weight matrix and <span class="katex-inline">G \in \mathbb{R}^{n \times n}</span> is the gradient, with <span class="katex-inline">W</span> initialized on the Stiefel manifold via msign. We swept across 14 matrix sizes from <span class="katex-inline">n = 16</span> to <span class="katex-inline">n = 1024</span> and 21 log-spaced values of <span class="katex-inline">\alpha</span> from 0.002 to 0.5, where <span class="katex-inline">\alpha</span> is the step size of the dual ascent updates on the Lagrange multiplier <span class="katex-inline">\Lambda</span>. Each configuration was averaged over 10 random seeds. For each size, the optimal <span class="katex-inline">\alpha</span> is the one that minimized the tangent violation <span class="katex-inline">\|H\|_{\text{RMS}}</span> after 100 iterations, where <span class="katex-inline">H = P(W^\top A + A^\top W)</span> measures how far the candidate update <span class="katex-inline">A \in \mathbb{R}^{n \times n}</span> is from the tangent space at <span class="katex-inline">W</span>. Here <span class="katex-inline">P</span> is the self-adjoint projector that defines the manifold (for Stiefel, <span class="katex-inline">P</span> is the identity, so <span class="katex-inline">H = W^\top A + A^\top W</span>), and <span class="katex-inline">A</span> is the current iterate of the dual ascent, reconstructed from <span class="katex-inline">\Lambda</span> via the matrix sign function.
+    </p>
+
+    <p>
+      The result is a clear upward trend: larger matrices want a larger step size. A log-linear fit over <span class="katex-inline">n \geq 32</span> gives
+    </p>
+
+    <p style="text-align: center; margin: 1.2em 0;">
+      <span class="katex-inline">\alpha_{\text{opt}}(n) \approx 0.003 \cdot n^{0.67}, \quad r^2 = 0.74.</span>
+    </p>
+
+    <p>
+      The <span class="katex-inline">n = 16</span> case sits well above this trend line (observed <span class="katex-inline">\alpha = 0.17</span> against a prediction of <span class="katex-inline">0.02</span>) and is excluded from the fit. This is a regime where the dual ascent problem is small enough that almost any <span class="katex-inline">\alpha</span> works, which is not the behaviour we care about for the transformer experiments that follow. Observed and predicted values for the fitted range are shown in Table 1.
+    </p>
+
+    <figure style="margin: 1.5em auto;">
+      <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+        Table 1: Optimal <span class="katex-inline">\alpha</span> per matrix size from a grid search over 21 log-spaced values, averaged over 10 seeds, compared against the fitted power law <span class="katex-inline">\alpha = 0.003 \cdot n^{0.67}</span>. Final <span class="katex-inline">\|H\|_{\text{RMS}}</span> is the tangent violation reached after 100 dual ascent iterations at the best <span class="katex-inline">\alpha</span>. The fit is performed over <span class="katex-inline">n \in [32, 1024]</span>.
+      </figcaption>
+      <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--rule);">
+            <th style="padding: 0.4em 1em; text-align: right;"><span class="katex-inline">n</span></th>
+            <th style="padding: 0.4em 1em; text-align: right;">observed <span class="katex-inline">\alpha_{\text{opt}}</span></th>
+            <th style="padding: 0.4em 1em; text-align: right;">fit prediction</th>
+            <th style="padding: 0.4em 1em; text-align: right;">final <span class="katex-inline">\|H\|_{\text{RMS}}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">32</td><td style="padding: 0.3em 1em; text-align: right;">0.042</td><td style="padding: 0.3em 1em; text-align: right;">0.031</td><td style="padding: 0.3em 1em; text-align: right;">3.2e-3</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">64</td><td style="padding: 0.3em 1em; text-align: right;">0.055</td><td style="padding: 0.3em 1em; text-align: right;">0.050</td><td style="padding: 0.3em 1em; text-align: right;">2.5e-3</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">128</td><td style="padding: 0.3em 1em; text-align: right;">0.072</td><td style="padding: 0.3em 1em; text-align: right;">0.079</td><td style="padding: 0.3em 1em; text-align: right;">1.1e-3</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">256</td><td style="padding: 0.3em 1em; text-align: right;">0.072</td><td style="padding: 0.3em 1em; text-align: right;">0.125</td><td style="padding: 0.3em 1em; text-align: right;">1.1e-3</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">512</td><td style="padding: 0.3em 1em; text-align: right;">0.126</td><td style="padding: 0.3em 1em; text-align: right;">0.199</td><td style="padding: 0.3em 1em; text-align: right;">8.5e-4</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">768</td><td style="padding: 0.3em 1em; text-align: right;">0.288</td><td style="padding: 0.3em 1em; text-align: right;">0.258</td><td style="padding: 0.3em 1em; text-align: right;">6.6e-4</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">1024</td><td style="padding: 0.3em 1em; text-align: right;">0.379</td><td style="padding: 0.3em 1em; text-align: right;">0.316</td><td style="padding: 0.3em 1em; text-align: right;">5.6e-4</td></tr>
+        </tbody>
+      </table>
+    </figure>
+
+    <figure style="margin: 1.5em auto;">
+      <img src="assets/manifold-muon/optimal_alpha_scaling.svg" alt="Optimal alpha vs matrix size, log-log plot, with fitted power law." style="display: block; margin: 0 auto; max-width: 100%;">
+      <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+        Figure 1: Grid-searched optimal <span class="katex-inline">\alpha</span> (filled dots) against matrix size on log-log axes, with the fitted power law <span class="katex-inline">\alpha = 0.003 \cdot n^{0.67}</span> overlaid (dashed line). The fit spans <span class="katex-inline">n \in [32, 1024]</span> and has <span class="katex-inline">r^2 = 0.74</span>. The <span class="katex-inline">n = 16</span> point (open circle) is shown for completeness but excluded from the fit. Each point averages over 10 seeds.
+      </figcaption>
+    </figure>
+
+    <p>
+      The more useful way to read this is in terms of Bernstein's default <span class="katex-inline">\alpha = 0.01</span>, with the caveat that the tangent violation <span class="katex-inline">\|H\|_{\text{RMS}}</span> is an internal convergence metric for dual ascent, not a direct measure of training quality. The retraction step that follows dual ascent partly absorbs violation error (we quantify this in the next section), and the Muon optimizer itself tolerates orthogonalization error up to <span class="katex-inline">\epsilon \approx 0.3</span> without training degradation <a href="#ref-muon">[1]</a>. So the numbers below describe how close dual ascent gets to its own optimality condition, not how close the resulting update is to the true steepest-descent direction.
+    </p>
+
+    <p>
+      At <span class="katex-inline">n = 64</span>, the grid search over 21 log-spaced <span class="katex-inline">\alpha</span> values returns a best final violation of <span class="katex-inline">2.5 \times 10^{-3}</span>. Bernstein's default <span class="katex-inline">\alpha = 0.01</span> reaches <span class="katex-inline">3.3 \times 10^{-3}</span> at step 100, about 33% higher than the grid-search best. At <span class="katex-inline">n = 768</span>, the grid-search best is <span class="katex-inline">6.6 \times 10^{-4}</span>, while <span class="katex-inline">\alpha = 0.01</span> reaches <span class="katex-inline">1.9 \times 10^{-3}</span>, about 2.8 times higher. The size-to-size increase in the gap is consistent with the power-law prediction that the default moves further below the fitted optimum as <span class="katex-inline">n</span> grows, but whether this matters for transformer training specifically is something our GPT-2 experiments below address, not something we can infer from <span class="katex-inline">\|H\|_{\text{RMS}}</span> alone.
+    </p>
+
+    <p>
+      The convergence curves under the uniform choice <span class="katex-inline">\alpha = 0.1</span> illustrate what changes across scales.
+    </p>
+
+    <figure style="margin: 1.5em auto;">
+      <img src="assets/manifold-muon/convergence_alpha0_1.svg" alt="Tangent violation vs dual ascent step for 14 matrix sizes at alpha=0.1." style="display: block; margin: 0 auto; max-width: 100%;">
+      <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+        Figure 2: Tangent violation <span class="katex-inline">\|H\|_{\text{RMS}}</span> across 100 dual ascent iterations at <span class="katex-inline">\alpha = 0.1</span>, one curve per matrix size, averaged over 10 seeds. Small matrices (<span class="katex-inline">n \leq 64</span>) overshoot early because <span class="katex-inline">\alpha = 0.1</span> is above their optimum; the linear decay schedule rescues them by the end. Large matrices (<span class="katex-inline">n \geq 512</span>) plateau until the schedule enters the converging regime, then drop sharply in the final 20 iterations.
+      </figcaption>
+    </figure>
+
+    <p>
+      Small matrices (<span class="katex-inline">n \leq 64</span>) overshoot in the first few iterations because <span class="katex-inline">\alpha = 0.1</span> is above their optimum. At <span class="katex-inline">n = 64</span>, the violation peaks around step 10 at roughly <span class="katex-inline">8 \times 10^{-2}</span>, then drifts down over the remaining iterations to a final value of <span class="katex-inline">5 \times 10^{-3}</span>. Large matrices (<span class="katex-inline">n \geq 512</span>) show a different pattern: the tangent violation sits on a plateau around <span class="katex-inline">4</span> to <span class="katex-inline">5 \times 10^{-3}</span> for roughly the first 80 iterations and then drops sharply in the last 20, reaching the final value an order of magnitude below the plateau level. We do not have a mechanistic explanation for the plateau. Bernstein's linear decay schedule <span class="katex-inline">\alpha_t = \alpha (1 - t/T)</span> takes the effective step size to zero at the end of the run, and it is plausible that the late drop reflects the iterates entering the converging regime only once <span class="katex-inline">\alpha_t</span> has been sufficiently shrunk, but distinguishing this from convergence that would have happened under any schedule would require an ablation we have not performed.
+    </p>
+
+    <p>
+      For the transformer experiments in the rest of this post we fix <span class="katex-inline">\alpha = 0.1</span> as a single universal choice. This is not the per-size optimum at any of the scales we tested. The ratio to the per-size optimum stays inside a factor of 2 across <span class="katex-inline">n \in [32, 1024]</span>, and the gap is small enough that we prefer the simplicity of a single number to the complication of a size-dependent schedule.
+    </p>
+
+    <h2>Retraction absorbs dual ascent error</h2>
+
+    <p>
+      Section 2 established that running dual ascent for 100 iterations with <span class="katex-inline">\alpha = 0.1</span> brings the tangent violation to roughly <span class="katex-inline">10^{-3}</span> across matrix sizes. If Manifold Muon calls dual ascent inside every optimizer step of a transformer training run, 100 inner iterations per outer step is prohibitive: each inner iteration is one msign call plus a handful of matrix multiplications, and unconstrained Muon gets by with a single msign call per step. Naively, Manifold Muon would be around 100 times slower per step than Muon. The question this section addresses is whether we really need 100 inner iterations, or whether we can stop much earlier without meaningfully changing the result that is actually applied to the model.
+    </p>
+
+    <p>
+      The relevant observation is that dual ascent is not the last step of Manifold Muon. After the dual ascent inner loop produces an update direction <span class="katex-inline">A</span>, the algorithm takes a step <span class="katex-inline">W - \eta A</span> and then <em>retracts</em> back onto the Stiefel manifold via the matrix sign function:
+    </p>
+
+    <p style="text-align: center; margin: 1.2em 0;">
+      <span class="katex-inline">W_{\text{new}} = \mathrm{msign}(W - \eta A) = U V^\top,</span>
+    </p>
+
+    <p>
+      where <span class="katex-inline">U \Sigma V^\top</span> is the SVD of <span class="katex-inline">W - \eta A</span>. Because <span class="katex-inline">\mathrm{msign}</span> keeps <span class="katex-inline">U</span> and <span class="katex-inline">V</span> but discards <span class="katex-inline">\Sigma</span> (replacing every singular value with 1), any error in <span class="katex-inline">A</span> that only affects the singular values of <span class="katex-inline">W - \eta A</span> gets annihilated by the retraction. Only errors that rotate the left or right singular vectors survive. In effect, the retraction projects onto a submanifold defined only by the singular vectors, so any error in <span class="katex-inline">A</span> that lives in the singular-value direction gets projected out. The quantity that actually matters for training, <span class="katex-inline">W_{\text{new}}</span>, should therefore be more robust to early-stopped dual ascent than <span class="katex-inline">A</span> itself.
+    </p>
+
+    <p>
+      To quantify this, for each of our 14 matrix sizes we ran dual ascent for 200 iterations (enough that the final update direction is effectively converged) and saved snapshots of <span class="katex-inline">A</span> at intermediate step counts <span class="katex-inline">T \in \{5, 10, 20, 30, 50, 75, 100, 150\}</span>. Calling the reference direction <span class="katex-inline">A_{\text{ref}} = A_{200}</span> and the early-stopped direction <span class="katex-inline">A_T</span>, we measured two quantities:
+    </p>
+
+    <p style="margin: 1.2em 0; text-align: center;">
+      <span class="katex-inline">e_A(T) = \frac{\|A_T - A_{\text{ref}}\|_F}{\|A_{\text{ref}}\|_F}, \qquad e_W(T) = \frac{\|W_T - W_{\text{ref}}\|_F}{\|W_{\text{ref}}\|_F}</span>
+    </p>
+
+    <p>
+      where <span class="katex-inline">W_T = \mathrm{msign}(W - \eta A_T)</span> and <span class="katex-inline">W_{\text{ref}} = \mathrm{msign}(W - \eta A_{\text{ref}})</span>, using <span class="katex-inline">\eta = 0.1</span> for the retraction step. The first quantity <span class="katex-inline">e_A(T)</span> measures how much the update direction still changes if we keep iterating dual ascent past <span class="katex-inline">T</span>; the second <span class="katex-inline">e_W(T)</span> measures the same thing for the retracted weight that the optimizer actually applies. All values are averaged over 10 seeds.
+    </p>
+
+    <p>
+      The gap between <span class="katex-inline">e_A(T)</span> and <span class="katex-inline">e_W(T)</span> is substantial and consistent across sizes. Table 2 shows both quantities at <span class="katex-inline">T = 20</span> for a representative subset of sizes.
+    </p>
+
+    <figure style="margin: 1.5em auto;">
+      <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+        Table 2: Update direction error <span class="katex-inline">e_A(20)</span> and retracted weight error <span class="katex-inline">e_W(20)</span> at <span class="katex-inline">T = 20</span> dual ascent iterations, relative to the <span class="katex-inline">T = 200</span> reference, averaged over 10 seeds. The rightmost column is the ratio, showing how much the retraction compresses the dual ascent error.
+      </figcaption>
+      <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--rule);">
+            <th style="padding: 0.4em 1em; text-align: right;"><span class="katex-inline">n</span></th>
+            <th style="padding: 0.4em 1em; text-align: right;"><span class="katex-inline">e_A(20)</span></th>
+            <th style="padding: 0.4em 1em; text-align: right;"><span class="katex-inline">e_W(20)</span></th>
+            <th style="padding: 0.4em 1em; text-align: right;"><span class="katex-inline">e_A / e_W</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">32</td><td style="padding: 0.3em 1em; text-align: right;">0.135</td><td style="padding: 0.3em 1em; text-align: right;">0.0094</td><td style="padding: 0.3em 1em; text-align: right;">14.5</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">64</td><td style="padding: 0.3em 1em; text-align: right;">0.159</td><td style="padding: 0.3em 1em; text-align: right;">0.0102</td><td style="padding: 0.3em 1em; text-align: right;">15.6</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">128</td><td style="padding: 0.3em 1em; text-align: right;">0.138</td><td style="padding: 0.3em 1em; text-align: right;">0.0096</td><td style="padding: 0.3em 1em; text-align: right;">14.4</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">512</td><td style="padding: 0.3em 1em; text-align: right;">0.085</td><td style="padding: 0.3em 1em; text-align: right;">0.0068</td><td style="padding: 0.3em 1em; text-align: right;">12.5</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">768</td><td style="padding: 0.3em 1em; text-align: right;">0.086</td><td style="padding: 0.3em 1em; text-align: right;">0.0071</td><td style="padding: 0.3em 1em; text-align: right;">12.1</td></tr>
+          <tr><td style="padding: 0.3em 1em; text-align: right;">1024</td><td style="padding: 0.3em 1em; text-align: right;">0.085</td><td style="padding: 0.3em 1em; text-align: right;">0.0070</td><td style="padding: 0.3em 1em; text-align: right;">12.2</td></tr>
+        </tbody>
+      </table>
+    </figure>
+
+    <p>
+      At every size, the update direction is still 8 to 16% away from where it will end up, yet the retracted weight is already within 1% of its final value. The compression factor <span class="katex-inline">e_A / e_W</span> sits in the range 12 to 16 across all 14 sizes we tested (the full sweep, including the sizes omitted from Table 2, stays within this band). The compression is essentially size-independent, which is what we would expect from a mechanism based on <span class="katex-inline">\mathrm{msign}</span> as a projection: the projection operator is the same at every size, and so is the fraction of <span class="katex-inline">A</span>'s error that it discards.
+    </p>
+
+    <figure style="margin: 1.5em auto;">
+      <img src="assets/manifold-muon/retraction_absorption.svg" alt="Two panels showing update direction error and retracted weight error versus dual ascent steps, on a shared log y-axis." style="display: block; margin: 0 auto; max-width: 100%;">
+      <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+        Figure 3: Update direction error <span class="katex-inline">e_A(T)</span> (left) and retracted weight error <span class="katex-inline">e_W(T)</span> (right) as a function of dual ascent iterations <span class="katex-inline">T</span>, with the reference fixed at <span class="katex-inline">T_{\text{ref}} = 200</span>. Both panels share a log y-axis, so the vertical gap between them is the compression factor. Averaged over 10 seeds per size.
+      </figcaption>
+    </figure>
+
+    <p>
+      The shape of the two curve families in Figure 3 carries additional information. On the left, <span class="katex-inline">e_A(T)</span> is not monotonic: it rises in the first few iterations (because early dual ascent with <span class="katex-inline">\alpha = 0.1</span> overshoots, as we saw in Section 2) and only starts decreasing around <span class="katex-inline">T = 30</span>. If we were reading the left panel alone, we might conclude that short dual ascent is actively harmful. On the right, <span class="katex-inline">e_W(T)</span> is nearly flat: the retracted weight at <span class="katex-inline">T = 5</span> is essentially the same as at <span class="katex-inline">T = 100</span>, within about a factor of 1.3. The retraction absorbs not just the final gap but the transient overshoot as well.
+    </p>
+
+    <p>
+      The practical implication is that the dual ascent step budget should be chosen based on <span class="katex-inline">e_W(T)</span>, not <span class="katex-inline">e_A(T)</span> or <span class="katex-inline">\|H\|_{\text{RMS}}</span>. At <span class="katex-inline">T = 20</span>, <span class="katex-inline">e_W \approx 0.7\%</span> across all sizes. For comparison, Muon itself tolerates orthogonalization error up to <span class="katex-inline">\epsilon \approx 0.3</span> in the matrix sign function without training degradation <a href="#ref-muon">[1]</a>, which is two orders of magnitude looser. A 0.7% retracted-weight error per step is deep inside the regime where the outer training loop does not notice.
+    </p>
+
+    <p>
+      For the transformer experiments in the rest of this post, we fix dual ascent to 20 iterations. This brings the per-step overhead of Manifold Muon from about 100 times that of unconstrained Muon down to about 20 times based on msign call counts. The actual measured overhead on GPT-2 small is lower, as we report in Section 4, because <a href="#ref-AdamW">AdamW [7]</a> handles a significant fraction of parameters and that portion of each step is not slower.
+    </p>
+
+    <p>
+      Two caveats are worth stating. First, this analysis uses random Gaussian <span class="katex-inline">(W, G)</span> pairs. During actual training, gradients have low-rank structure, weights are not exactly on the manifold between retractions (they drift slightly), and the distribution of <span class="katex-inline">A</span> that dual ascent is trying to find is correlated with recent updates. The absorption factor might be different in that regime. Second, the absorption argument we gave is based on <span class="katex-inline">\mathrm{msign}</span> throwing away the singular values of <span class="katex-inline">W - \eta A</span>. This argument applies directly to the Stiefel retraction. For DGram the retraction is <span class="katex-inline">W \mapsto U V^\top \cdot \mathrm{diag}(\Sigma)</span>, which keeps the singular values, so the absorption effect may be weaker. We use the same 20-step budget for DGram in the experiments below, but an honest reading of Table 2 is that we have only verified the <span class="katex-inline">T = 20</span> choice for Stiefel.
+    </p>    
+    
+<h2>Experiments: five manifold assignments on GPT-2</h2>
+
+<p>
+  Sections 2 and 3 made Manifold Muon tractable at transformer scale. This section puts it to work. We train GPT-2 small (124M parameters) on OpenWebText with the nanoGPT training recipe <a href="#ref-nanogpt">[5]</a> and ask a question Bernstein raises as an open problem: <em>which manifold should each layer live on?</em> The Stiefel manifold is the obvious choice if we want unit singular values. The DGram manifold, recently proposed by Keigwin <a href="#ref-gram-space">[4]</a>, is a strictly weaker constraint: <span class="katex-inline">\mathrm{off}(W^\top W) = 0</span> forces the columns of <span class="katex-inline">W</span> to be orthogonal but lets their norms vary. Both are sensible defaults, and there is no a priori reason transformers should prefer one over the other, or prefer the same choice for every layer.
+</p>
+
+<p>
+  We test five manifold assignments, summarized in Table 3.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+    Table 3: The five manifold assignments tested. Attention matrices are the four projection matrices (Q, K, V, O) of every layer. MLP matrices are the two projection matrices (up, down) of every layer. Embeddings, LayerNorm parameters, and the LM head are trained with AdamW in every condition.
+  </figcaption>
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Condition</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Attention (Q, K, V, O)</th>
+        <th style="padding: 0.4em 1em; text-align: left;">MLP (up, down)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 0.3em 1em;">Unconstrained</td><td style="padding: 0.3em 1em;">Muon (no manifold)</td><td style="padding: 0.3em 1em;">Muon (no manifold)</td></tr>
+      <tr><td style="padding: 0.3em 1em;">All Stiefel</td><td style="padding: 0.3em 1em;">Manifold Muon on Stiefel</td><td style="padding: 0.3em 1em;">Manifold Muon on Stiefel</td></tr>
+      <tr><td style="padding: 0.3em 1em;">All DGram</td><td style="padding: 0.3em 1em;">Manifold Muon on DGram</td><td style="padding: 0.3em 1em;">Manifold Muon on DGram</td></tr>
+      <tr><td style="padding: 0.3em 1em;">Hetero</td><td style="padding: 0.3em 1em;">Manifold Muon on Stiefel</td><td style="padding: 0.3em 1em;">Manifold Muon on DGram</td></tr>
+      <tr><td style="padding: 0.3em 1em;">Hetero-inv</td><td style="padding: 0.3em 1em;">Manifold Muon on DGram</td><td style="padding: 0.3em 1em;">Manifold Muon on Stiefel</td></tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  The Unconstrained condition is the baseline: plain Muon on every 2D weight, no manifold constraints, which matches how Muon is typically deployed in practice. All Stiefel and All DGram apply the same constraint to every weight matrix. Hetero puts attention on Stiefel and MLPs on DGram, reflecting the hypothesis that attention projections and MLP projections play different roles and might prefer different geometries. Hetero-inv is the ablation: the same asymmetry reversed. If Hetero works because asymmetric constraints are useful per se, both Hetero and Hetero-inv should do well. If it works because Stiefel is right for attention and DGram is right for MLPs, only Hetero should do well.
+</p>
+
+<p>
+  Figure 4 shows where each optimizer applies in the GPT-2 architecture for the Hetero condition.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <img src="assets/manifold-muon/architecture-muon.svg" alt="GPT-2 architecture diagram showing attention projections in orange, MLP projections in blue, and remaining parameters in gray." 
+    style="display: block; margin: 0 auto; max-width: 100%; max-height: 500px;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+    Figure 4: GPT-2 small architecture with the Hetero manifold assignment. Attention projections (orange) are constrained to the Stiefel manifold. MLP projections (blue) are constrained to the DGram manifold. Token embeddings, positional embeddings, LayerNorm parameters, and the language modeling head (gray) are trained with AdamW. The other four conditions in Table 3 have the same skeleton, with different manifolds attached to the orange and blue blocks.
+  </figcaption>
+</figure>
+
+<p>
+  All runs use the same hyperparameters apart from the manifold assignment. We use dual ascent with <span class="katex-inline">\alpha = 0.1</span> and 20 iterations, as justified in Sections 2 and 3. The learning rate for Manifold Muon and Muon is tuned for the Unconstrained baseline and reused across conditions. AdamW hyperparameters follow the nanoGPT defaults. Training runs for 50,000 steps on a single H100 with OpenWebText, which takes between 2 hours (Unconstrained) and 30 hours (All DGram, which has the slowest retraction) per condition. Validation loss is measured every 1000 steps on a held-out split.
+</p>
+
+<p>
+  Figure 5 shows the validation loss for all five conditions. The left panel shows the full trajectory; the right panel zooms in on the surviving conditions from step 10k onwards, where the separations become legible.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <img src="assets/manifold-muon/val_loss_curves.svg" alt="Two-panel plot. Left panel: full validation loss trajectories for five conditions over 50000 steps. Right panel: zoomed view of the three surviving conditions from step 10000 to 50000." 
+    style="display: block; margin: 0 auto; max-width: 100%; max-height: 100%;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+    Figure 5: Validation loss on OpenWebText across 50000 training steps for the five manifold assignments. Left: the full trajectory. All DGram diverges at step 16000 and never recovers; Hetero-inv survives an initial spike at step 20000 but never returns to its pre-spike minimum, drifting around 4.0 nats for the rest of the run. Dashed segments mark post-divergence behavior; the x marks the divergence point. Right: zoom on the three surviving conditions. Hetero ends 0.03 nats below All Stiefel, which ends 0.02 nats below Unconstrained.
+  </figcaption>
+</figure>
+
+<p>
+  Two of the five conditions diverge. All DGram trains normally until around step 15000, then its validation loss starts drifting upward and settles into a chaotic plateau between 6 and 8 nats for the rest of the run. Hetero-inv trains stably until step 20000, at which point its loss spikes to about 7 nats, drops back to around 4.3 nats, spikes a second time at step 25000, and then oscillates around 4.0 nats for the remainder of training. Neither run produces NaN; both simply fail to make further progress. We discuss what goes wrong in both cases in the next two sections.
+</p>
+
+<p>
+  The three surviving conditions reach the following final validation losses, along with their wall-clock cost per step:
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+    Table 4: Best and final validation loss, divergence status, and wall-clock time per step (median, measured after a 100-step warmup that excludes compilation and CUDA init). The ratio column is relative to Unconstrained. Diverged conditions report their best loss and the step at which divergence was first detected.
+  </figcaption>
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Condition</th>
+        <th style="padding: 0.4em 1em; text-align: right;">Best val loss</th>
+        <th style="padding: 0.4em 1em; text-align: right;">Final @ 50k</th>
+        <th style="padding: 0.4em 1em; text-align: right;">Status</th>
+        <th style="padding: 0.4em 1em; text-align: right;">ms/step</th>
+        <th style="padding: 0.4em 1em; text-align: right;">ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 0.3em 1em;">Unconstrained</td><td style="padding: 0.3em 1em; text-align: right;">3.3842</td><td style="padding: 0.3em 1em; text-align: right;">3.3855</td><td style="padding: 0.3em 1em; text-align: right;">converged</td><td style="padding: 0.3em 1em; text-align: right;">161</td><td style="padding: 0.3em 1em; text-align: right;">1.0x</td></tr>
+      <tr><td style="padding: 0.3em 1em;">All Stiefel</td><td style="padding: 0.3em 1em; text-align: right;">3.3679</td><td style="padding: 0.3em 1em; text-align: right;">3.3679</td><td style="padding: 0.3em 1em; text-align: right;">converged</td><td style="padding: 0.3em 1em; text-align: right;">933</td><td style="padding: 0.3em 1em; text-align: right;">5.8x</td></tr>
+      <tr><td style="padding: 0.3em 1em;">All DGram</td><td style="padding: 0.3em 1em; text-align: right;">3.8623</td><td style="padding: 0.3em 1em; text-align: right;">7.2871</td><td style="padding: 0.3em 1em; text-align: right;">diverged @ 16k</td><td style="padding: 0.3em 1em; text-align: right;">2186</td><td style="padding: 0.3em 1em; text-align: right;">13.6x</td></tr>
+      <tr><td style="padding: 0.3em 1em;"><strong>Hetero</strong></td><td style="padding: 0.3em 1em; text-align: right;"><strong>3.3544</strong></td><td style="padding: 0.3em 1em; text-align: right;"><strong>3.3544</strong></td><td style="padding: 0.3em 1em; text-align: right;"><strong>converged</strong></td><td style="padding: 0.3em 1em; text-align: right;">1342</td><td style="padding: 0.3em 1em; text-align: right;">8.3x</td></tr>
+      <tr><td style="padding: 0.3em 1em;">Hetero-inv</td><td style="padding: 0.3em 1em; text-align: right;">3.8684</td><td style="padding: 0.3em 1em; text-align: right;">3.9988</td><td style="padding: 0.3em 1em; text-align: right;">diverged @ 20k</td><td style="padding: 0.3em 1em; text-align: right;">1758</td><td style="padding: 0.3em 1em; text-align: right;">10.9x</td></tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  Hetero reaches a final validation loss of 3.3544 at step 50000, which is 0.013 nats below All Stiefel (3.3679) and 0.031 nats below Unconstrained (3.3855). These are small numbers in absolute terms and this is a single-seed run, so we do not claim the Hetero-vs-Stiefel gap is statistically resolved. The Unconstrained-vs-Hetero gap is larger and more robust. What is clear is that the asymmetric Hetero assignment is not harmful relative to either uniform alternative, and the symmetric reversal Hetero-inv is catastrophic. This asymmetry is the main finding of the post.
+</p>
+
+<p>
+  The wall-clock costs in the rightmost column of Table 4 are also worth looking at in their own right. Section 3 estimated the per-step overhead of Manifold Muon at around 20 times that of unconstrained Muon based on msign call counts alone. The measured overhead is 5.8x for All Stiefel and 8.3x for Hetero, noticeably better than the estimate. The discrepancy is because our estimate ignored the fact that AdamW is run on roughly 40% of the parameters (embeddings, LM head, LayerNorm), and that step doesn't get slower. All DGram is 13.6x, the slowest of the surviving or semi-surviving conditions, because DGram's retraction requires a full SVD while Stiefel's retraction is just another msign call.
+</p>
+
+<p>
+  The next two sections dig into the two main observations from Table 4: why Hetero beats All Stiefel and All DGram, and why the two diverged conditions diverge in the specific way they do.
+</p>    
+
+<h2>Attention wants Stiefel, MLPs want DGram</h2>
+
+<p>
+  The results in Table 4 invite a natural question: why does the direction of the asymmetry matter so much? Both Hetero and Hetero-inv apply one manifold to attention and the other to MLPs. Only the assignment direction differs. Yet Hetero converges to the best validation loss of any condition, and Hetero-inv diverges at step 20000. This section gives a theoretical argument for why this happens, grounded in the spectral properties of the two manifolds and the structure of the attention mechanism.
+</p>
+
+<h3>Stiefel and DGram: what the constraints actually fix</h3>
+
+<p>
+  Both the Stiefel manifold and the DGram manifold are instances of the Gram-space framework introduced by Keigwin <a href="#ref-gram-space">[4]</a>. A weight matrix <span class="katex-inline">W \in \mathbb{R}^{m \times n}</span> (with <span class="katex-inline">m \geq n</span>) lives on a manifold defined by a self-adjoint projector <span class="katex-inline">P</span> and a target matrix <span class="katex-inline">C</span> via the constraint
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">P(W^\top W - C) = 0.</span>
+</p>
+
+<p>
+  The two manifolds differ only in the choice of <span class="katex-inline">P</span>:
+</p>
+
+<p>
+  <strong>Stiefel.</strong> Set <span class="katex-inline">P = \mathrm{Id}</span> (the identity on symmetric matrices) and <span class="katex-inline">C = I_n</span>. The constraint becomes
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">W^\top W = I_n.</span>
+</p>
+
+<p>
+  Writing the SVD of <span class="katex-inline">W</span> as <span class="katex-inline">W = U \Sigma V^\top</span>, the constraint forces <span class="katex-inline">\Sigma = I</span>, so every singular value of <span class="katex-inline">W</span> equals 1. The condition number is <span class="katex-inline">\kappa(W) = \sigma_{\max}(W) / \sigma_{\min}(W) = 1</span>, and the spectral norm is <span class="katex-inline">\|W\|_2 = 1</span>.
+</p>
+
+<p>
+  <strong>DGram.</strong> Set <span class="katex-inline">P = \mathrm{Off}</span> (the off-diagonal projector, which zeros out the diagonal of a symmetric matrix) and <span class="katex-inline">C = 0</span>. The constraint becomes
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\mathrm{off}(W^\top W) = 0,</span>
+</p>
+
+<p>
+  which says that the off-diagonal entries of the Gram matrix vanish. Let <span class="katex-inline">w_1, \dots, w_n</span> denote the columns of <span class="katex-inline">W</span>. Then <span class="katex-inline">(W^\top W)_{ij} = w_i^\top w_j</span>, and the constraint is
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">w_i^\top w_j = 0 \quad \text{for all } i \neq j.</span>
+</p>
+
+<p>
+  The columns are pairwise orthogonal, but their norms <span class="katex-inline">\|w_i\| = \sqrt{(W^\top W)_{ii}}</span> are unconstrained. The diagonal of <span class="katex-inline">W^\top W</span> is exactly the vector of squared column norms, and because <span class="katex-inline">P = \mathrm{Off}</span> does not touch the diagonal, these norms are free to vary during training.
+</p>
+
+<p>
+  To see what this means spectrally, observe that the SVD of a matrix with orthogonal columns takes a simple form. If the columns of <span class="katex-inline">W</span> are orthogonal with norms <span class="katex-inline">\sigma_1, \dots, \sigma_n > 0</span>, we can write
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">W = U \, \mathrm{diag}(\sigma_1, \dots, \sigma_n) \, V^\top,</span>
+</p>
+
+<p>
+  where <span class="katex-inline">U \in \mathbb{R}^{m \times n}</span> and <span class="katex-inline">V \in \mathbb{R}^{n \times n}</span> have orthonormal columns. The <span class="katex-inline">\sigma_i</span> are the singular values of <span class="katex-inline">W</span>, and they equal the column norms. In particular, the spectral norm <span class="katex-inline">\|W\|_2 = \sigma_{\max}(W) = \max_i \|w_i\|</span> is not bounded by any constraint. The condition number <span class="katex-inline">\kappa(W) = \sigma_{\max} / \sigma_{\min}</span> is also unconstrained.
+</p>
+
+<p>
+  In summary:
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Property</th>
+        <th style="padding: 0.4em 1em; text-align: center;">Stiefel</th>
+        <th style="padding: 0.4em 1em; text-align: center;">DGram</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 0.3em 1em;">Column orthogonality</td><td style="padding: 0.3em 1em; text-align: center;">enforced</td><td style="padding: 0.3em 1em; text-align: center;">enforced</td></tr>
+      <tr><td style="padding: 0.3em 1em;">Column norms</td><td style="padding: 0.3em 1em; text-align: center;">fixed at 1</td><td style="padding: 0.3em 1em; text-align: center;">free</td></tr>
+      <tr><td style="padding: 0.3em 1em;"><span class="katex-inline">\|W\|_2</span></td><td style="padding: 0.3em 1em; text-align: center;">= 1</td><td style="padding: 0.3em 1em; text-align: center;">unbounded</td></tr>
+      <tr><td style="padding: 0.3em 1em;"><span class="katex-inline">\kappa(W)</span></td><td style="padding: 0.3em 1em; text-align: center;">= 1</td><td style="padding: 0.3em 1em; text-align: center;">unbounded</td></tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  DGram is strictly weaker than Stiefel. Every Stiefel matrix satisfies the DGram constraint (orthogonal columns with all norms equal to 1 is a special case of orthogonal columns with arbitrary norms), but DGram matrices can have arbitrarily large or small singular values. The extra freedom in DGram is exactly the freedom to learn a per-column scaling. Whether this freedom helps or hurts depends on the role of the matrix in the network.
+</p>
+
+<h3>Attention logits and the spectral norm of <span class="katex-inline">W_Q W_K^\top</span></h3>
+
+<p>
+  Scaled dot-product attention computes, for an input sequence <span class="katex-inline">X \in \mathbb{R}^{L \times d}</span> of <span class="katex-inline">L</span> tokens with embedding dimension <span class="katex-inline">d</span>, the query and key projections
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">Q = X W_Q, \quad K = X W_K,</span>
+</p>
+
+<p>
+  where <span class="katex-inline">W_Q, W_K \in \mathbb{R}^{d \times d_k}</span> and <span class="katex-inline">d_k</span> is the head dimension. The attention logit matrix <span class="katex-inline">Z \in \mathbb{R}^{L \times L}</span> is
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">Z = \frac{Q K^\top}{\sqrt{d_k}} = \frac{X W_Q W_K^\top X^\top}{\sqrt{d_k}}.</span>
+</p>
+
+<p>
+  Each entry <span class="katex-inline">Z_{ij}</span> is the (scaled) inner product between two projected tokens:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">Z_{ij} = \frac{x_i^\top W_Q W_K^\top x_j}{\sqrt{d_k}}.</span>
+</p>
+
+<p>
+  The attention weight matrix is then <span class="katex-inline">S = \mathrm{softmax}(Z)</span>, applied row-wise. The magnitude of the entries of <span class="katex-inline">Z</span> controls how peaked or uniform the attention distribution is. Large <span class="katex-inline">|Z_{ij}|</span> values push the softmax toward a one-hot vector; small values keep it closer to the uniform distribution <span class="katex-inline">1/L</span>.
+</p>
+
+<p>
+  The key matrix in this chain is the product <span class="katex-inline">W_Q W_K^\top \in \mathbb{R}^{d \times d}</span>. Its spectral norm controls the range of <span class="katex-inline">Z</span>. We now derive the bound.
+</p>
+
+<p>
+  For any two matrices <span class="katex-inline">A \in \mathbb{R}^{m \times n}</span> and <span class="katex-inline">B \in \mathbb{R}^{n \times p}</span>, the spectral norm is submultiplicative:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|AB\|_2 \leq \|A\|_2 \, \|B\|_2.</span>
+</p>
+
+<p>
+  This is a standard fact: the spectral norm is the operator norm induced by the Euclidean vector norm, and operator norms are submultiplicative. Applying it to <span class="katex-inline">W_Q W_K^\top</span> with <span class="katex-inline">\|W_K^\top\|_2 = \|W_K\|_2</span> (the spectral norm is invariant under transposition):
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|W_Q W_K^\top\|_2 \leq \|W_Q\|_2 \, \|W_K\|_2 = \sigma_{\max}(W_Q) \cdot \sigma_{\max}(W_K).</span>
+</p>
+
+<p>
+  Combining this with the expression for <span class="katex-inline">Z_{ij}</span>, and letting <span class="katex-inline">\|X\|_{2,\infty} = \max_i \|x_i\|_2</span> denote the maximum token norm:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">|Z_{ij}| = \frac{|x_i^\top W_Q W_K^\top x_j|}{\sqrt{d_k}} \leq \frac{\|x_i\|_2 \, \|W_Q W_K^\top\|_2 \, \|x_j\|_2}{\sqrt{d_k}} \leq \frac{\|X\|_{2,\infty}^2 \; \sigma_{\max}(W_Q) \, \sigma_{\max}(W_K)}{\sqrt{d_k}}.</span>
+</p>
+
+<p>
+  The first inequality is Cauchy-Schwarz applied to the bilinear form <span class="katex-inline">x_i^\top M x_j</span> with <span class="katex-inline">M = W_Q W_K^\top</span>: for any vector <span class="katex-inline">u</span>, <span class="katex-inline">|u^\top M v| \leq \|u\| \, \|M\|_2 \, \|v\|</span> (this is the definition of the operator norm). The second inequality is the submultiplicativity bound derived above.
+</p>
+
+<p>
+  We can now compare the two manifold choices.
+</p>
+
+<p>
+  <strong>Stiefel attention</strong> (<span class="katex-inline">W_Q, W_K \in \mathrm{St}(d, d_k)</span>). By definition, <span class="katex-inline">\sigma_{\max}(W_Q) = \sigma_{\max}(W_K) = 1</span>. The bound collapses to
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">|Z_{ij}| \leq \frac{\|X\|_{2,\infty}^2}{\sqrt{d_k}}.</span>
+</p>
+
+<p>
+  In a transformer with LayerNorm, <span class="katex-inline">\|x_i\|_2</span> is approximately <span class="katex-inline">\sqrt{d}</span> (LayerNorm normalizes the RMS to a learned scale, typically close to 1 per component, so the <span class="katex-inline">\ell_2</span> norm scales as <span class="katex-inline">\sqrt{d}</span>). For GPT-2 small, <span class="katex-inline">d = 768</span> and <span class="katex-inline">d_k = 64</span> (12 heads), giving
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">|Z_{ij}| \lesssim \frac{768}{\sqrt{64}} = \frac{768}{8} = 96.</span>
+</p>
+
+<p>
+  This is a loose upper bound (not all tokens project onto the top singular direction simultaneously), but the important property is that it exists and is fixed for the duration of training. The optimizer cannot push logits to arbitrarily large values by changing the weights because the Stiefel constraint caps the spectral norm at 1.
+</p>
+
+<p>
+  <strong>DGram attention</strong> (<span class="katex-inline">W_Q, W_K \in \mathrm{DGram}(d, d_k)</span>). The singular values are free. The bound becomes
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">|Z_{ij}| \leq \frac{\|X\|_{2,\infty}^2 \; \sigma_{\max}(W_Q) \, \sigma_{\max}(W_K)}{\sqrt{d_k}},</span>
+</p>
+
+<p>
+  which grows without bound if the optimizer increases the largest singular values of <span class="katex-inline">W_Q</span> or <span class="katex-inline">W_K</span> during training. There is no structural mechanism in DGram to prevent this growth. The column orthogonality constraint does not restrict the column norms, so the optimizer is free to scale any column of <span class="katex-inline">W_Q</span> or <span class="katex-inline">W_K</span> by an arbitrary positive factor without leaving the manifold.
+</p>
+
+<p>
+  To make the growth mechanism concrete: if a single column <span class="katex-inline">w_k</span> of <span class="katex-inline">W_Q</span> has its norm multiplied by a factor <span class="katex-inline">\lambda > 1</span> while all other columns stay fixed, the resulting matrix still satisfies the DGram constraint (the column is still orthogonal to the others, and the diagonal of the Gram matrix has merely increased by <span class="katex-inline">(\lambda^2 - 1)\|w_k\|^2</span> in the <span class="katex-inline">k</span>-th entry). The spectral norm of <span class="katex-inline">W_Q</span> jumps from <span class="katex-inline">\|w_k\|</span> to <span class="katex-inline">\lambda\|w_k\|</span>, and the logit bound inflates by the same factor. Nothing in the DGram constraint says this is not allowed.
+</p>   
+
+<h3>Softmax saturation kills the gradient</h3>
+
+<p>
+  Having established that DGram attention allows <span class="katex-inline">\|W_Q W_K^\top\|_2</span> to grow without bound, we now show what this growth does to the gradient signal. The mechanism runs through the softmax function: large logits saturate the softmax, and a saturated softmax has a near-zero Jacobian, which blocks gradients from reaching <span class="katex-inline">W_Q</span>, <span class="katex-inline">W_K</span>, and <span class="katex-inline">W_V</span>.
+</p>
+
+<p>
+  We begin with the Jacobian of the softmax. Let <span class="katex-inline">s = \mathrm{softmax}(z) \in \mathbb{R}^n</span> for logits <span class="katex-inline">z \in \mathbb{R}^n</span>. The Jacobian <span class="katex-inline">J \in \mathbb{R}^{n \times n}</span> has entries
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">J_{ij} = \frac{\partial s_i}{\partial z_j} = s_i(\delta_{ij} - s_j),</span>
+</p>
+
+<p>
+  which can be written in matrix form as
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">J = \mathrm{diag}(s) - s s^\top.</span>
+</p>
+
+<p>
+  This matrix is symmetric (since <span class="katex-inline">J_{ij} = -s_i s_j = J_{ji}</span> for <span class="katex-inline">i \neq j</span>, and <span class="katex-inline">J_{ii} = s_i(1 - s_i)</span>), positive semidefinite, and has a null space spanned by the ones vector <span class="katex-inline">\mathbf{1}</span> (because <span class="katex-inline">J\mathbf{1} = s - s \cdot s^\top \mathbf{1} = s - s = 0</span>). The Frobenius norm of <span class="katex-inline">J</span> controls how much gradient signal passes through the softmax layer. When <span class="katex-inline">\|J\|_F</span> is small, upstream gradients are attenuated by a small factor at every position and every head, effectively silencing the attention mechanism's contribution to learning.
+</p>
+
+<p>
+  <strong>Proposition.</strong> <em>For any logit vector <span class="katex-inline">z \in \mathbb{R}^n</span>, the softmax Jacobian satisfies</em>
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F^2 \leq \|s\|_2^2 \left(1 - \|s\|_2^2\right) \leq \frac{1}{4},</span>
+</p>
+
+<p>
+  <em>with the right inequality tight when <span class="katex-inline">\|s\|_2^2 = 1/2</span> and the left inequality tight when <span class="katex-inline">s</span> is a uniform distribution.</em>
+</p>
+
+<p>
+  <em>Proof.</em> Expanding the Frobenius norm of <span class="katex-inline">J = \mathrm{diag}(s) - ss^\top</span>:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F^2 = \|\mathrm{diag}(s)\|_F^2 - 2\langle \mathrm{diag}(s),\, ss^\top\rangle_F + \|ss^\top\|_F^2.</span>
+</p>
+
+<p>
+  Computing each term. The first: <span class="katex-inline">\|\mathrm{diag}(s)\|_F^2 = \sum_i s_i^2 = \|s\|_2^2</span>. The second: <span class="katex-inline">\langle \mathrm{diag}(s), ss^\top\rangle_F = \mathrm{tr}(\mathrm{diag}(s) \cdot ss^\top) = \sum_i s_i \cdot s_i^2 = \|s\|_3^3</span>. The third: <span class="katex-inline">\|ss^\top\|_F^2 = \mathrm{tr}(ss^\top ss^\top) = (s^\top s)^2 = \|s\|_2^4</span>. So
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F^2 = \|s\|_2^2 - 2\|s\|_3^3 + \|s\|_2^4. \quad (\star)</span>
+</p>
+
+<p>
+  To obtain the upper bound, we apply Jensen's inequality to the convex function <span class="katex-inline">f(t) = t^2</span> with the probability measure defined by <span class="katex-inline">s</span> itself. Since <span class="katex-inline">s_i \geq 0</span> and <span class="katex-inline">\sum_i s_i = 1</span>:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|s\|_3^3 = \sum_i s_i \cdot s_i^2 = \mathbb{E}_{i \sim s}[s_i^2] \geq \left(\mathbb{E}_{i \sim s}[s_i]\right)^2 = \left(\sum_i s_i \cdot s_i\right)^2 = \|s\|_2^4.</span>
+</p>
+
+<p>
+  Substituting <span class="katex-inline">\|s\|_3^3 \geq \|s\|_2^4</span> into <span class="katex-inline">(\star)</span>:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F^2 \leq \|s\|_2^2 - 2\|s\|_2^4 + \|s\|_2^4 = \|s\|_2^2(1 - \|s\|_2^2).</span>
+</p>
+
+<p>
+  The function <span class="katex-inline">g(t) = t(1 - t)</span> on <span class="katex-inline">[0, 1]</span> attains its maximum of <span class="katex-inline">1/4</span> at <span class="katex-inline">t = 1/2</span>, giving <span class="katex-inline">\|J\|_F \leq 1/2</span>. <span style="float: right;">&#9632;</span>
+</p>
+
+<p>
+  The bound <span class="katex-inline">\|J\|_F \leq 1/2</span> is universal and does not depend on the logits. The useful content is how <span class="katex-inline">\|J\|_F</span> behaves as the logit range grows and the softmax saturates. The following corollary makes this precise.
+</p>
+
+<p>
+  <strong>Corollary (exponential decay with logit range).</strong> <em>Let <span class="katex-inline">\Delta z = \max_i z_i - \min_i z_i</span>. Then</em>
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F \leq \sqrt{2(n - 1)}\; e^{-\Delta z / 2}.</span>
+</p>
+
+<p>
+  <em>Proof.</em> Without loss of generality let <span class="katex-inline">z_1 = \max_i z_i</span>. Then
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">s_1 = \frac{e^{z_1}}{\sum_j e^{z_j}} \geq \frac{e^{z_1}}{e^{z_1} + (n - 1)\,e^{z_1 - \Delta z}} = \frac{1}{1 + (n - 1)\,e^{-\Delta z}},</span>
+</p>
+
+<p>
+  where the inequality uses <span class="katex-inline">z_j \geq z_1 - \Delta z</span> for all <span class="katex-inline">j</span>, so <span class="katex-inline">\sum_{j \neq 1} e^{z_j} \leq (n-1)\,e^{z_1 - \Delta z}</span>. Since <span class="katex-inline">\|s\|_2^2 \geq s_1^2</span>:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">1 - \|s\|_2^2 \leq 1 - s_1^2 = (1 - s_1)(1 + s_1) \leq 2(1 - s_1).</span>
+</p>
+
+<p>
+  The last factor is
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">1 - s_1 \leq 1 - \frac{1}{1 + (n-1)\,e^{-\Delta z}} = \frac{(n - 1)\,e^{-\Delta z}}{1 + (n-1)\,e^{-\Delta z}} \leq (n - 1)\,e^{-\Delta z}.</span>
+</p>
+
+<p>
+  Combining with the Proposition and using <span class="katex-inline">\|s\|_2^2 \leq 1</span>:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F^2 \leq \|s\|_2^2(1 - \|s\|_2^2) \leq 1 \cdot 2(n-1)\,e^{-\Delta z},</span>
+</p>
+
+<p>
+  and taking the square root gives the claim. <span style="float: right;">&#9632;</span>
+</p>
+
+<h3>The gradient vanishing chain</h3>
+
+<p>
+  The Corollary provides the final link in the argument. On the DGram manifold, the chain runs:
+</p>
+
+<p style="margin-left: 2em;">
+  <span class="katex-inline">\sigma_{\max}(W_Q),\, \sigma_{\max}(W_K)</span> grow (unconstrained by DGram)
+  <br><br>
+  <span class="katex-inline">\Longrightarrow \quad \|W_Q W_K^\top\|_2 \leq \sigma_{\max}(W_Q)\,\sigma_{\max}(W_K)</span> grows
+  <br><br>
+  <span class="katex-inline">\Longrightarrow \quad \Delta z \leq \frac{2\,\|X\|_{2,\infty}^2\;\sigma_{\max}(W_Q)\,\sigma_{\max}(W_K)}{\sqrt{d_k}}</span> can grow
+  <br><br>
+  <span class="katex-inline">\Longrightarrow \quad \|J\|_F \leq \sqrt{2(n-1)}\;e^{-\Delta z / 2}</span> shrinks exponentially
+  <br><br>
+  <span class="katex-inline">\Longrightarrow \quad</span> gradients with respect to <span class="katex-inline">W_Q, W_K, W_V</span> vanish
+  <br><br>
+  <span class="katex-inline">\Longrightarrow \quad</span> attention layers stop learning; loss stagnates or drifts.
+</p>
+
+<p>
+  Each arrow is either a proven bound or a direct consequence of the chain rule. The conclusion is not that DGram attention must diverge (the bound is an upper bound, and the optimizer might happen to keep singular values small), but that DGram provides no structural guarantee against this mode of failure, while Stiefel does: by fixing <span class="katex-inline">\sigma_{\max}(W_Q) = \sigma_{\max}(W_K) = 1</span>, the first link in the chain is severed.
+</p>
+
+<p>
+  We emphasize that this is an argument about possibility, not inevitability. The theory says DGram attention can degrade via this channel and Stiefel attention cannot. Whether DGram attention does degrade in practice depends on the training dynamics and the data. Our experiments in Section 4 show that it does: both conditions with DGram on attention (All DGram and Hetero-inv) diverge, while both conditions with Stiefel on attention (All Stiefel and Hetero) converge stably. Section 6 provides direct empirical evidence that the singular values of attention matrices do in fact grow during training in the DGram conditions.
+</p>
+
+<h3>Why MLPs tolerate DGram</h3>
+
+<p>
+  The same failure channel does not exist in MLPs because their forward pass has a qualitatively different structure. A standard transformer MLP computes
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\mathrm{MLP}(x) = \mathrm{GELU}(x\,W_{\mathrm{up}})\,W_{\mathrm{down}},</span>
+</p>
+
+<p>
+  where <span class="katex-inline">W_{\mathrm{up}} \in \mathbb{R}^{d \times d_{\mathrm{ff}}}</span> and <span class="katex-inline">W_{\mathrm{down}} \in \mathbb{R}^{d_{\mathrm{ff}} \times d}</span>. The Jacobian of the nonlinearity is
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\frac{\partial\,\mathrm{GELU}(a)}{\partial a} = \mathrm{diag}\!\left(\mathrm{GELU}'(a_1),\; \ldots,\; \mathrm{GELU}'(a_{d_{\mathrm{ff}}})\right),</span>
+</p>
+
+<p>
+  where <span class="katex-inline">a = x\,W_{\mathrm{up}}</span>. This differs from the softmax Jacobian in two ways that matter.
+</p>
+
+<p>
+  <strong>Element-wise vs. global coupling.</strong> The GELU Jacobian is diagonal: <span class="katex-inline">\partial\,\mathrm{GELU}(a)_i / \partial a_j = 0</span> for <span class="katex-inline">i \neq j</span>. If one pre-activation <span class="katex-inline">a_k</span> saturates (becomes very negative, so <span class="katex-inline">\mathrm{GELU}'(a_k) \approx 0</span>), the gradient through every other component <span class="katex-inline">a_j</span> with <span class="katex-inline">j \neq k</span> is unaffected. By contrast, when one softmax entry <span class="katex-inline">s_k \to 1</span>, the Jacobian <span class="katex-inline">J = \mathrm{diag}(s) - ss^\top</span> sends <span class="katex-inline">\|J\|_F \to 0</span>, killing the gradient through every entry simultaneously. This global coupling is the core of the failure mode, and it is absent in MLPs.
+</p>
+
+<p>
+  <strong>Bounded derivative without normalization dependence.</strong> The spectral norm of the GELU Jacobian is simply <span class="katex-inline">\max_i |\mathrm{GELU}'(a_i)| \leq 1.08</span>, regardless of the magnitudes of the pre-activations. In particular, <span class="katex-inline">\|W_{\mathrm{up}}\|_2</span> can grow on the DGram manifold, scaling up the pre-activations <span class="katex-inline">a</span>, and the Jacobian spectral norm stays bounded. The gradient flow through the MLP is not sensitive to the singular values of its weight matrices in the way that the softmax is.
+</p>
+
+<p>
+  There is an additional structural protection from the transformer's residual stream. The output of each sub-layer (attention or MLP) is added to the residual:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">x_{\ell+1} = x_\ell + \mathrm{MLP}(x_\ell).</span>
+</p>
+
+<p>
+  LayerNorm at the input of the next sub-layer rescales the <span class="katex-inline">\ell_2</span> norm of the residual stream to approximately <span class="katex-inline">\sqrt{d}</span>. If MLP output norms grow because <span class="katex-inline">W_{\mathrm{up}}</span> or <span class="katex-inline">W_{\mathrm{down}}</span> have large singular values, LayerNorm absorbs the scale change before it reaches the next layer. For attention logits, this protection does not apply: the query-key product <span class="katex-inline">QK^\top / \sqrt{d_k}</span> is computed after LayerNorm but before softmax, so there is no intervening normalization to absorb the effect of large <span class="katex-inline">\sigma_{\max}(W_Q)</span> or <span class="katex-inline">\sigma_{\max}(W_K)</span>.
+</p>
+
+<p>
+  The consequence for DGram is that the per-column scale freedom, which is DGram's defining extra degree of freedom relative to Stiefel, plays entirely different roles in the two sub-layers:
+</p>
+
+<p style="margin-left: 2em;">
+  In <strong>attention</strong>, per-column scaling of <span class="katex-inline">W_Q</span> or <span class="katex-inline">W_K</span> inflates the logit range <span class="katex-inline">\Delta z</span> without limit, triggering the softmax saturation chain described above. The scale freedom is destructive.
+</p>
+<p style="margin-left: 2em;">
+  In <strong>MLPs</strong>, per-column scaling of <span class="katex-inline">W_{\mathrm{up}}</span> lets the network learn different activation scales for different feature directions, which amounts to a learned feature-wise weighting. The scale change is absorbed by LayerNorm before it reaches the next layer, and no global saturation mechanism exists. The scale freedom is a useful inductive bias.
+</p>
+
+<h3>Theoretical predictions vs. experimental outcomes</h3>
+
+<p>
+  The arguments above generate a prediction for every cell of the Attention × MLP × {Stiefel, DGram} table:
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+    Table 5: Theoretical predictions derived from the spectral norm bound and the softmax Jacobian analysis, compared against the experimental outcomes from Table 4.
+  </figcaption>
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Condition</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Attention</th>
+        <th style="padding: 0.4em 1em; text-align: left;">MLP</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Theory predicts</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Observed</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 0.3em 1em;">All Stiefel</td>
+        <td style="padding: 0.3em 1em;">Stiefel: <span class="katex-inline">\kappa = 1</span>, safe</td>
+        <td style="padding: 0.3em 1em;">Stiefel: no scale freedom, rigid</td>
+        <td style="padding: 0.3em 1em;">Stable but suboptimal</td>
+        <td style="padding: 0.3em 1em;">3.368, converged</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">All DGram</td>
+        <td style="padding: 0.3em 1em;">DGram: <span class="katex-inline">\kappa</span> unbounded, dangerous</td>
+        <td style="padding: 0.3em 1em;">DGram: scale freedom, beneficial</td>
+        <td style="padding: 0.3em 1em;">Diverges (attention failure)</td>
+        <td style="padding: 0.3em 1em;">Diverged @ 16k</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;"><strong>Hetero</strong></td>
+        <td style="padding: 0.3em 1em;">Stiefel: <span class="katex-inline">\kappa = 1</span>, safe</td>
+        <td style="padding: 0.3em 1em;">DGram: scale freedom, beneficial</td>
+        <td style="padding: 0.3em 1em;">Best of both worlds</td>
+        <td style="padding: 0.3em 1em;"><strong>3.354, converged</strong></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">Hetero-inv</td>
+        <td style="padding: 0.3em 1em;">DGram: <span class="katex-inline">\kappa</span> unbounded, dangerous</td>
+        <td style="padding: 0.3em 1em;">Stiefel: no scale freedom, rigid</td>
+        <td style="padding: 0.3em 1em;">Diverges (attention failure)</td>
+        <td style="padding: 0.3em 1em;">Diverged @ 20k</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">Unconstrained</td>
+        <td style="padding: 0.3em 1em;">No constraint, <span class="katex-inline">\kappa</span> free</td>
+        <td style="padding: 0.3em 1em;">No constraint, <span class="katex-inline">\kappa</span> free</td>
+        <td style="padding: 0.3em 1em;">No manifold benefit</td>
+        <td style="padding: 0.3em 1em;">3.385, converged</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  All five experimental outcomes are consistent with the theoretical predictions. The two conditions predicted to be dangerous (All DGram and Hetero-inv) are the two that diverge. The condition predicted to combine the best properties (Hetero) achieves the best validation loss. The condition predicted to be safe but rigid (All Stiefel) sits between Hetero and Unconstrained.
+</p>
+
+<p>
+  One might ask why Unconstrained Muon, which also has no upper bound on weight singular values, does not suffer the same failure. The answer is that the softmax saturation chain requires the singular values to actually grow, not merely to be free to grow. In unconstrained training, two mechanisms regulate singular value growth: weight decay, which pulls all singular values toward zero at every step, and the <span class="katex-inline">\mathrm{msign}</span> normalization of the gradient, which caps the per-step change to any singular value at <span class="katex-inline">\eta</span>. In the manifold-constrained conditions, weight decay is not applied to the constrained parameters because it would push the weights off the manifold. The regulatory mechanism is absent, and the DGram manifold provides no substitute. Stiefel provides its own substitute by construction: the singular values are fixed at 1 and cannot grow regardless of what the optimizer does.
+</p>
+
+<p>
+  We emphasize the limits of the theory. The softmax Jacobian bound is tight (the Proposition and Corollary are equalities or one-sided bounds, not approximations), but the chain connecting it to divergence involves upper bounds that need not be saturated. The theory says the failure can happen under DGram and cannot happen under Stiefel; it does not prove that will happen. The experiments confirm that it does, and the next section provides direct spectral evidence for the mechanism.
+</p>
+
+<h2>Why DGram breaks attention</h2>
+
+<p>
+  Section 5 argued that DGram attention is vulnerable to singular value growth, and that this growth triggers softmax saturation and gradient vanishing. The argument was based on bounds: the spectral norm of <span class="katex-inline">W_Q W_K^\top</span> can grow without limit on DGram, and the softmax Jacobian decays exponentially in the logit range. This section checks whether the growth actually happens during training, using singular value snapshots saved every 1000 steps for all five conditions.
+</p>
+
+<p>
+  Figure 6 shows the largest singular value <span class="katex-inline">\sigma_{\max}</span> across all attention weights (left panel) and all MLP weights (right panel) over 50000 training steps. The attention panel uses a log scale on the y-axis.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <img src="assets/manifold-muon/spectral_evolution.svg" alt="Two-panel plot. Left: log-scale σ_max of attention weights over training steps. Right: linear-scale σ_max of MLP weights." style="display: block; margin: 0 auto; max-width: 100%;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+    Figure 6: Largest singular value <span class="katex-inline">\sigma_{\max}</span> across all weight matrices in attention (left, log scale) and MLP (right, linear scale) over 50000 training steps. DGram attention weights (All DGram and Hetero-inv) grow exponentially from step 0, reaching <span class="katex-inline">10^5</span> to <span class="katex-inline">10^6</span> by step 50000. Stiefel attention (All Stiefel and Hetero) stays at exactly 1 by construction. Unconstrained Muon stays bounded at <span class="katex-inline">\sigma_{\max} \approx 4</span>, regulated by weight decay. MLP weights (right) grow moderately under DGram and stay at 1 under Stiefel. 
+  </figcaption>
+</figure>
+
+<h3>Attention: exponential growth on DGram</h3>
+
+<p>
+  The left panel of Figure 6 is the central piece of empirical evidence in this post. Three observations stand out.
+</p>
+
+<p>
+  First, the growth of <span class="katex-inline">\sigma_{\max}</span> on DGram attention is not a sudden event. It begins at step 0 and proceeds continuously, appearing as a straight line on the log-scale y-axis. This means the growth is approximately exponential: <span class="katex-inline">\sigma_{\max}(t) \propto e^{ct}</span> for some positive rate <span class="katex-inline">c</span>. By step 16000, where All DGram's validation loss first spikes (Section 4), attention <span class="katex-inline">\sigma_{\max}</span> has already reached roughly 30 to 50. By step 20000, where Hetero-inv's loss spikes, it has reached roughly 50 to 100. The growth predates the divergence, which is consistent with the causal direction predicted by Section 5: singular value growth drives logit inflation, which drives softmax saturation, which causes the loss to stagnate and then spike.
+</p>
+
+<p>
+  Second, the two DGram-attention conditions (All DGram and Hetero-inv) follow nearly identical growth trajectories despite having different MLP manifolds (DGram vs Stiefel). This makes sense: the MLP manifold has no direct effect on the attention weights' spectral properties, so the growth rate is determined by the attention manifold alone.
+</p>
+
+<p>
+  Third, Unconstrained Muon (gray dashed line) has attention weights with <span class="katex-inline">\sigma_{\max} \approx 4</span> throughout training. The singular values rise briefly in the first few thousand steps and then decrease. This confirms the regulatory mechanism described in Section 5: weight decay pulls singular values toward zero at every step, and because Unconstrained Muon does not retract onto a manifold, the weight decay is applied directly to the weight matrix. On DGram, weight decay is not applied to the constrained parameters (it would push the weights off the manifold), so no analogous brake exists.
+</p>
+
+<h3>MLP: bounded growth under DGram</h3>
+
+<p>
+  The right panel of Figure 6 tells the complementary story. DGram MLP weights (Hetero in green, All DGram in blue) have <span class="katex-inline">\sigma_{\max}</span> that grows from roughly 1 to 7.5 or 18 over the course of training, then levels off. This growth is bounded and does not trigger any instability. The Section 5 argument explains why: the MLP forward pass applies GELU element-wise, so saturating one feature direction does not kill the gradient in other directions. The per-column scale freedom that DGram provides is being used productively by the optimizer to learn feature-wise weightings.
+</p>
+
+<p>
+  Stiefel MLP weights (All Stiefel in orange) stay at <span class="katex-inline">\sigma_{\max} = 1</span> throughout, as expected. This rigidity is the price of the Stiefel constraint on MLPs: the network cannot learn per-feature scales, which is one plausible explanation for the 0.014-nat gap between Hetero (3.354) and All Stiefel (3.368) in Table 4.
+</p>
+
+<p>
+  Unconstrained MLP weights (gray dashed) peak at <span class="katex-inline">\sigma_{\max} \approx 4</span> around step 2000 and then decrease to roughly 2 by step 50000. This matches the attention pattern: weight decay pulls the singular values back down once the optimizer no longer needs to push them up. The trajectory suggests that the unconstrained optimizer initially benefits from larger singular values but eventually finds a solution that does not require them, while DGram (which has no weight decay on the constrained parameters) retains the learned scales.
+</p>
+
+<h3>Singular value spectrum: DGram fans out, Stiefel stays flat</h3>
+
+<p>
+  Figure 7 shows the full singular value spectrum (768 values, sorted in descending order) of a representative attention weight matrix (layer 0, c_attn) at each saved training step, animated as a GIF. The left panel is All DGram; the right panel is All Stiefel.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <img src="assets/manifold-muon/sv_animation.gif" alt="Animated GIF showing sorted singular value spectra of layer 0 attention weights. DGram spectrum fans out over training steps while Stiefel stays flat at 1." style="display: block; margin: 0 auto; max-width: 100%;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
+    Figure 7: Sorted singular value spectrum of a representative attention weight matrix (layer 0, c_attn) over training, comparing All DGram (left) and All Stiefel (right). The dashed gray line marks <span class="katex-inline">\sigma = 1</span>. Under DGram, the spectrum fans out from a near-uniform initialization (range 0.5 to 1.5 at step 0) to a wide spread (range 2.5 to 12 at step 50000). Under Stiefel, all 768 singular values stay at exactly 1 throughout training.
+</figcaption>
+</figure>
+
+<p>
+  First, the growth of <span class="katex-inline">\sigma_{\max}</span> on DGram attention is not a sudden event. It begins at step 0 and proceeds continuously, appearing as a straight line on the log-scale y-axis. This means the growth is approximately exponential: <span class="katex-inline">\sigma_{\max}(t) \propto e^{ct}</span> for some positive rate <span class="katex-inline">c</span>. The growth is already well underway by the time All DGram's validation loss first spikes at step 16000 and Hetero-inv's loss spikes at step 20000, which is consistent with the causal direction predicted by Section 5: singular value growth drives logit inflation, which drives softmax saturation, which causes the loss to stagnate and then spike.
+</p>
+
+<p>
+  The gap between layer 0's moderate spectrum (<span class="katex-inline">\sigma_{\max} \approx 12</span> at step 50000 in Figure 7) and the aggregate maximum across all layers (<span class="katex-inline">\sigma_{\max} > 10^5</span> in Figure 6) indicates that the singular value explosion is not uniform across layers: some layers contribute far more to the aggregate maximum than others. We have not broken down the growth by layer in this post, so we cannot say whether it is concentrated in deeper layers, in specific heads, or distributed unevenly in some other pattern. A per-layer analysis would be a natural extension.
+</p>
+
+<h3>Summary of empirical verification</h3>
+
+<p>
+  The spectral data confirms every link in the theoretical chain from Section 5 that can be directly observed:
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+    Table 7: Theoretical predictions from Section 5 matched against the spectral measurements.
+  </figcaption>
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Prediction</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Source</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Observed</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 0.3em 1em;"><span class="katex-inline">\sigma_{\max}</span> grows on DGram attention</td>
+        <td style="padding: 0.3em 1em;">Proposition 2</td>
+        <td style="padding: 0.3em 1em;">Exponential growth from step 0, reaching <span class="katex-inline">10^5</span> to <span class="katex-inline">10^6</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;"><span class="katex-inline">\sigma_{\max} \equiv 1</span> on Stiefel attention</td>
+        <td style="padding: 0.3em 1em;">Proposition 1</td>
+        <td style="padding: 0.3em 1em;">Flat at 1 throughout (by construction)</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">DGram MLP is safe (no softmax)</td>
+        <td style="padding: 0.3em 1em;">Section 5</td>
+        <td style="padding: 0.3em 1em;">Bounded growth to 7.5 or 18, no instability</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">Unconstrained is regulated by weight decay</td>
+        <td style="padding: 0.3em 1em;">Section 5</td>
+        <td style="padding: 0.3em 1em;"><span class="katex-inline">\sigma_{\max} \approx 4</span>, peaks then decreases</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  The one link we cannot directly observe is the softmax saturation itself. Measuring the attention entropy or the Jacobian norm <span class="katex-inline">\|J\|_F</span> during training would require saving the attention logits at each step, which we did not do. The causal chain from Section 5 runs <span class="katex-inline">\sigma_{\max} \uparrow \;\Rightarrow\; \Delta z \uparrow \;\Rightarrow\; \|J\|_F \downarrow \;\Rightarrow\;</span> gradient vanishing <span class="katex-inline">\Rightarrow</span> divergence. We observe the first link (singular value growth) and the last link (divergence). The intermediate links (logit inflation, Jacobian collapse) are implied by the proven bounds but not directly measured. Saving attention logit statistics during training would close this gap and is a straightforward extension of the spectral logging infrastructure we already have.
+</p>
+
+<h2>Related work</h2>
+
+<p>
+  Manifold Muon was introduced by Bernstein <a href="#ref-manifold-muon">[3]</a>, building on ideas from Jianlin Su <a href="#ref-su">[8]</a>, who proposed a fixed-point iteration for the Stiefel-constrained steepest descent problem, and Franz Cesista <a href="#ref-cesista">[9]</a>, who gave a heuristic solution to the same problem. Bernstein's contribution was to reformulate the problem as a convex dual and solve it via subgradient ascent, yielding the dual ascent inner loop that our Sections 2 and 3 analyze. The Gram-space generalization to DGram and Oblique manifolds is due to Keigwin <a href="#ref-gram-space">[4]</a>, who unified the three manifolds under a single projector framework. Our work takes these two pieces and applies them to transformer pretraining, a setting where Bernstein's algorithm had not yet been tested beyond CIFAR-10 MLPs and where Keigwin's framework had not been accompanied by training experiments.
+</p>
+
+<h3>Faster inner loops for Manifold Muon</h3>
+
+<p>
+  The dual ascent convergence issue we address in Section 2 has been independently tackled by two other approaches. Buchanan <a href="#ref-buchanan">[10]</a> observed that Bernstein's subgradient method converges at rate <span class="katex-inline">O(1/\sqrt{k})</span> because the nuclear norm objective is nonsmooth, and proposed an ADMM (alternating direction method of multipliers) reformulation that achieves <span class="katex-inline">O(1/k)</span> convergence and more than 2x wall-clock speedup on a single H100. Our approach is different and complementary: rather than changing the algorithm, we showed that the existing algorithm with a larger step size and early stopping gives retracted weights within 1% of the fully converged solution. Combining ADMM with our early-stopping observation is a natural next step that we have not explored.
+</p>
+
+<p>
+  A more radical departure is MCSD (Manifold Constrained Steepest Descent) <a href="#ref-mcsd">[11]</a>, which eliminates the inner loop entirely. MCSD computes the Riemannian gradient, applies a norm-constrained linear minimization oracle in a single step, and projects back onto the manifold. Its Stiefel specialization, called SPEL, admits scalable implementations via the matrix sign function and comes with convergence guarantees. The nested-loop structure of Bernstein's algorithm (and ours) is replaced by a single-loop scheme. Whether our finding that retraction absorbs tangent-space error extends to MCSD's projection step is an open question.
+</p>
+
+<h3>Manifold constraints for large language models</h3>
+
+<p>
+  The most directly comparable concurrent work is Mano <a href="#ref-mano">[12]</a> by Gu and Xie, who apply manifold-inspired optimization to LLaMA (350M and 1.3B) and Qwen3 (0.6B and 1.7B), reporting improvements over both AdamW and Muon. Mano uses the Oblique manifold with a soft constraint: a regularization term <span class="katex-inline">\lambda\|\mathrm{off}(W^\top W)\|_F^2</span> is added to the training loss, and periodic Sinkhorn-Knopp normalization alternates between column and row orthogonality. Our approach differs in two respects. First, we use a hard constraint enforced by retraction at every step, so the weights are exactly on the manifold throughout training rather than approximately near it. Second, and more importantly, Mano applies the same constraint to every weight matrix, while the central finding of our work is that uniform assignment can fail catastrophically and that the right assignment depends on the layer type. Mano does not test heterogeneous assignments or report instabilities, possibly because the Oblique manifold (which constrains only column norms, not column orthogonality) is mild enough to avoid the softmax saturation failure mode we identified in Section 5.
+</p>
+
+<h3>Structured gradient methods</h3>
+
+<p>
+  Our work sits within a broader trend of exploiting matrix structure in neural network optimization. ASGO <a href="#ref-asgo">[13]</a> uses the low-rank structure of gradients and the block-diagonal structure of Hessians to build adaptive preconditioners, achieving faster convergence than Adam on standard benchmarks. The connection to our work is indirect but conceptual: DGram's per-column scale freedom can be viewed as a learned diagonal preconditioner on the column space, and the fact that this freedom helps MLPs but hurts attention suggests that the right preconditioning structure is layer-dependent. Bernstein's Modula project <a href="#ref-manifold-muon">[3]</a> formalizes this intuition through the theory of modular manifolds, which composes per-layer manifold constraints with per-layer norm choices to build a coherent optimizer for the whole network. Our experiments test heterogeneous manifold assignments on a transformer, combining Bernstein's optimization framework with Keigwin's Gram-space taxonomy to ask which manifold suits which layer. We are not aware of prior work that compares multiple manifold assignments within a single architecture, though we have not done an exhaustive survey.
+</p>
+
+<h2>Limitations and future work</h2>
+
+<h3>Experimental limitations</h3>
+
+<p>
+  The experiments in this post have several limitations that should be stated plainly. All five conditions are single-seed runs on a single model size (GPT-2 small, 124M parameters) trained on a single dataset (OpenWebText). The gap between Hetero (3.354) and All Stiefel (3.368) is 0.014 nats, which is within the range that could be explained by seed variance. The divergence of All DGram and Hetero-inv is more robust: both failure modes are too structured and too specific in their onset step to be seed noise, but we have not verified this with multiple seeds either. The learning rate was tuned for the Unconstrained baseline and reused across all manifold conditions without per-condition tuning, which means the manifold conditions may be underperforming their potential. Finally, we tested only two manifolds (Stiefel, DGram) and only two layer groupings (attention vs MLP), leaving the question of per-head or per-layer assignment unexplored.
+</p>
+
+<h3>Manifold assignment as an optimization problem</h3>
+
+<p>
+  Section 5 gave a post hoc argument for why Hetero works and Hetero-inv does not. We now attempt to formalize this argument into a framework that could, in principle, be applied to architectures beyond GPT-2. The framework is incomplete and we state clearly where it transitions from proven results to conjecture.
+</p>
+
+<p>
+  <strong>Setup.</strong> Consider a neural network composed of <span class="katex-inline">L</span> modules <span class="katex-inline">f_1, \ldots, f_L</span>, where each module <span class="katex-inline">f_\ell</span> maps a weight matrix <span class="katex-inline">W_\ell \in \mathbb{R}^{m_\ell \times n_\ell}</span> and an input <span class="katex-inline">h \in \mathbb{R}^{L_{\mathrm{seq}} \times d}</span> to an output <span class="katex-inline">h' \in \mathbb{R}^{L_{\mathrm{seq}} \times d'}</span>. We have a set of candidate manifolds <span class="katex-inline">\mathcal{M}^{(1)}, \ldots, \mathcal{M}^{(K)}</span>, and we seek an assignment <span class="katex-inline">\pi: \{1, \ldots, L\} \to \{1, \ldots, K\}</span> specifying which manifold each module's weights should live on.
+</p>
+
+<p>
+  The question is: what makes one assignment better than another? We propose that the answer involves two competing objectives, stability and expressiveness, and define each in turn.
+</p>
+
+<p>
+  <strong>Definition 1 (Tangent sensitivity operator).</strong> For a module <span class="katex-inline">f</span> with weight <span class="katex-inline">W \in \mathcal{M}</span> and input <span class="katex-inline">h</span>, the tangent sensitivity operator is the linear map
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\mathcal{T}_{f, \mathcal{M}}(W, h) : T_W \mathcal{M} \to \mathbb{R}^{L_{\mathrm{seq}} \times d'}, \quad \Delta W \mapsto \frac{\partial f}{\partial W}(W, h)[\Delta W],</span>
+</p>
+
+<p>
+  where <span class="katex-inline">T_W \mathcal{M}</span> is the tangent space to <span class="katex-inline">\mathcal{M}</span> at <span class="katex-inline">W</span>. This operator measures how the module's output responds to infinitesimal perturbations of the weight along directions that stay on the manifold. Its singular values determine how much gradient signal reaches each tangent direction during backpropagation: if <span class="katex-inline">\sigma_i(\mathcal{T}) = 0</span> for some direction, that direction receives zero gradient and the corresponding degree of freedom is unlearnable.
+</p>
+
+<p>
+  <strong>Definition 2 (Gradient non-degeneracy).</strong> A module-manifold pair <span class="katex-inline">(f, \mathcal{M})</span> is <em>gradient non-degenerate</em> on an input set <span class="katex-inline">\mathcal{H}</span> if
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\inf_{W \in \mathcal{M},\; h \in \mathcal{H}} \sigma_{\min}\!\left(\mathcal{T}_{f, \mathcal{M}}(W, h)\right) > 0.</span>
+</p>
+
+<p>
+  This says that no tangent direction is ever gradient-dead, uniformly over all weights on the manifold and all inputs in the support. It is a stability condition: if it holds, training cannot get stuck in a regime where the weight gradients vanish due to the interaction between the module's nonlinearity and the manifold constraint.
+</p>
+
+<p>
+  <strong>Remark.</strong> Gradient non-degeneracy controls <span class="katex-inline">\sigma_{\min}(\mathcal{T})</span>, i.e., the lower bound on gradient flow. This is distinct from the Lipschitz property, which controls <span class="katex-inline">\sigma_{\max}(\mathcal{T})</span>, i.e., the upper bound. Bernstein's modular norm framework <a href="#ref-manifold-muon">[3]</a> is primarily concerned with the Lipschitz property for budgeting learning rates. The non-degeneracy condition is complementary: it ensures that the learning rate budget is not wasted on dead directions.
+</p>
+
+<p>
+  We can now verify gradient non-degeneracy for the module-manifold pairs tested in this post.
+</p>
+
+<p>
+  <strong>Proposition 1 (Attention on Stiefel is non-degenerate).</strong> <em>Let <span class="katex-inline">g(W_Q, W_K, h) = h W_Q W_K^\top h^\top / \sqrt{d_k}</span> be the attention logit module, and let <span class="katex-inline">W_Q, W_K \in \mathrm{St}(d, d_k)</span>. For any input set <span class="katex-inline">\mathcal{H}</span> with bounded token norms <span class="katex-inline">\|h_i\|_2 \leq R</span>, the logit range satisfies <span class="katex-inline">\Delta z \leq 2R^2 / \sqrt{d_k}</span>, and the softmax Jacobian satisfies</em>
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\|J\|_F \geq c(d_k, L_{\mathrm{seq}}, R) > 0,</span>
+</p>
+
+<p>
+  <em>where <span class="katex-inline">c</span> is a positive constant independent of <span class="katex-inline">W_Q, W_K</span>. Therefore the attention module is gradient non-degenerate on Stiefel.</em>
+</p>
+
+<p>
+  <em>Proof.</em> On Stiefel, <span class="katex-inline">\sigma_{\max}(W_Q) = \sigma_{\max}(W_K) = 1</span>, so <span class="katex-inline">\|W_Q W_K^\top\|_2 \leq 1</span>. The logit range bound follows from Section 5. The Corollary in Section 5 gives <span class="katex-inline">\|J\|_F \leq \sqrt{2(L_{\mathrm{seq}} - 1)}\, e^{-\Delta z / 2}</span>; inverting, since <span class="katex-inline">\Delta z</span> is bounded above by the constant <span class="katex-inline">2R^2 / \sqrt{d_k}</span>, the Jacobian norm is bounded below by <span class="katex-inline">\|J\|_F \geq \sqrt{2(L_{\mathrm{seq}} - 1)}\, e^{-R^2 / \sqrt{d_k}} > 0</span>. Since the Jacobian of the full attention output with respect to <span class="katex-inline">W_Q</span> factors through <span class="katex-inline">J</span>, the tangent sensitivity operator inherits a positive lower bound on its smallest singular value. <span style="float: right;">&#9632;</span>
+</p>
+
+<p>
+  <strong>Proposition 2 (Attention on DGram is degenerate).</strong> <em>Let <span class="katex-inline">W_Q \in \mathrm{DGram}(d, d_k)</span>. For any <span class="katex-inline">\epsilon > 0</span>, there exists <span class="katex-inline">W_Q' \in \mathrm{DGram}(d, d_k)</span> such that <span class="katex-inline">\|J\|_F < \epsilon</span>. Therefore the attention module is gradient degenerate on DGram.</em>
+</p>
+
+<p>
+  <em>Proof.</em> Take any column <span class="katex-inline">w_k</span> of <span class="katex-inline">W_Q</span> and replace it with <span class="katex-inline">\lambda w_k</span> for <span class="katex-inline">\lambda > 1</span>. The resulting matrix <span class="katex-inline">W_Q'</span> still satisfies the DGram constraint (the column remains orthogonal to all others, and the diagonal of the Gram matrix merely changes in the <span class="katex-inline">k</span>-th entry). As <span class="katex-inline">\lambda \to \infty</span>, <span class="katex-inline">\sigma_{\max}(W_Q') \to \infty</span>, so <span class="katex-inline">\Delta z \to \infty</span>, and the Corollary gives <span class="katex-inline">\|J\|_F \to 0</span>. <span style="float: right;">&#9632;</span>
+</p>
+
+<p>
+  For MLP modules, the situation is different. The MLP forward pass <span class="katex-inline">f(W_{\mathrm{up}}, h) = \mathrm{GELU}(h\, W_{\mathrm{up}})</span> has tangent sensitivity
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\mathcal{T}[\Delta W] = \mathrm{diag}(\mathrm{GELU}'(h\, W_{\mathrm{up}})) \cdot h \cdot \Delta W.</span>
+</p>
+
+<p>
+  Since <span class="katex-inline">\mathrm{GELU}'(a) \to 0</span> as <span class="katex-inline">a \to -\infty</span>, there exist weights on both Stiefel and DGram for which some pre-activations are deeply negative and the corresponding tangent directions receive near-zero gradient. Therefore neither Stiefel nor DGram is gradient non-degenerate for the MLP module. The non-degeneracy criterion does not distinguish between them here.
+</p>
+
+<p>
+  To break the tie, we introduce a second quantity.
+</p>
+
+<p>
+  <strong>Definition 3 (Manifold expressiveness).</strong> The expressiveness of a manifold <span class="katex-inline">\mathcal{M} \subset \mathbb{R}^{m \times n}</span> is the dimension of its tangent space:
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\mathrm{expr}(\mathcal{M}) = \dim T_W \mathcal{M}.</span>
+</p>
+
+<p>
+  For the three manifolds in the Gram-space framework, the dimensions are computed by counting the independent constraints:
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Manifold</th>
+        <th style="padding: 0.4em 1em; text-align: left;">Constraint</th>
+        <th style="padding: 0.4em 1em; text-align: center;">Number of constraints</th>
+        <th style="padding: 0.4em 1em; text-align: center;"><span class="katex-inline">\mathrm{expr}(\mathcal{M})</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 0.3em 1em;">Stiefel</td><td style="padding: 0.3em 1em;"><span class="katex-inline">W^\top W = I</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">\binom{n+1}{2}</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">mn - \binom{n+1}{2}</span></td></tr>
+      <tr><td style="padding: 0.3em 1em;">DGram</td><td style="padding: 0.3em 1em;"><span class="katex-inline">\mathrm{off}(W^\top W) = 0</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">\binom{n}{2}</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">mn - \binom{n}{2}</span></td></tr>
+      <tr><td style="padding: 0.3em 1em;">Oblique</td><td style="padding: 0.3em 1em;"><span class="katex-inline">\mathrm{diag}(W^\top W) = I</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">n</span></td><td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">mn - n</span></td></tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  DGram has exactly <span class="katex-inline">n</span> more degrees of freedom than Stiefel. These correspond to the <span class="katex-inline">n</span> column norms, which are free on DGram and fixed at 1 on Stiefel. In the MLP context, these extra degrees of freedom let the network learn a per-feature scaling, which amounts to a diagonal preconditioner on the activation space. On Stiefel, this capacity is absent.
+</p>
+
+<p>
+  <strong>The manifold assignment problem.</strong> Combining the two criteria, we arrive at the following formulation.
+</p>
+
+<p>
+  <strong>Problem.</strong> <em>Given modules <span class="katex-inline">\{f_\ell\}_{\ell=1}^L</span> and candidate manifolds <span class="katex-inline">\{\mathcal{M}^{(k)}\}_{k=1}^K</span>, find the assignment <span class="katex-inline">\pi^*</span> that solves</em>
+</p>
+
+<p style="text-align: center; margin: 1.2em 0;">
+  <span class="katex-inline">\pi^* = \arg\max_\pi \sum_{\ell=1}^{L} \mathrm{expr}(\mathcal{M}^{(\pi(\ell))})</span>
+</p>
+
+<p style="text-align: center; margin: 0.6em 0;">
+  <span class="katex-inline">\text{subject to} \quad (f_\ell,\, \mathcal{M}^{(\pi(\ell))}) \;\text{is gradient non-degenerate for all}\; \ell.</span>
+</p>
+
+<p>
+  In words: maximize the total degrees of freedom available to the optimizer, subject to the constraint that no module-manifold pair allows gradient vanishing. Stability is a hard constraint; expressiveness is the objective.
+</p>
+
+<p>
+  <strong>Evaluation on the GPT-2 experiments.</strong> We verify that the solution to this problem matches the experimental outcomes from Table 4.
+</p>
+
+<figure style="margin: 1.5em auto;">
+  <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-bottom: 0.6em; text-align: center;">
+    Table 6: Evaluation of the manifold assignment problem on the four constrained conditions. For each module type and manifold, we report whether gradient non-degeneracy holds (the feasibility constraint) and the tangent space dimension (the objective). The assignment maximizing total expressiveness subject to feasibility is Hetero, matching the experimental best.
+  </figcaption>
+  <table style="margin: 0 auto; border-collapse: collapse; font-size: 0.92rem;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="padding: 0.4em 1em; text-align: left;">Condition</th>
+        <th style="padding: 0.4em 1em; text-align: center;">Attn non-deg?</th>
+        <th style="padding: 0.4em 1em; text-align: center;">MLP non-deg?</th>
+        <th style="padding: 0.4em 1em; text-align: center;">Feasible?</th>
+        <th style="padding: 0.4em 1em; text-align: center;">Total expr</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 0.3em 1em;">All Stiefel</td>
+        <td style="padding: 0.3em 1em; text-align: center;">yes (Prop 1)</td>
+        <td style="padding: 0.3em 1em; text-align: center;">vacuous</td>
+        <td style="padding: 0.3em 1em; text-align: center;">yes</td>
+        <td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">L \cdot (mn - \binom{n+1}{2})</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">All DGram</td>
+        <td style="padding: 0.3em 1em; text-align: center;">no (Prop 2)</td>
+        <td style="padding: 0.3em 1em; text-align: center;">vacuous</td>
+        <td style="padding: 0.3em 1em; text-align: center;"><strong>no</strong></td>
+        <td style="padding: 0.3em 1em; text-align: center;">infeasible</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;"><strong>Hetero</strong></td>
+        <td style="padding: 0.3em 1em; text-align: center;">yes (Prop 1)</td>
+        <td style="padding: 0.3em 1em; text-align: center;">vacuous</td>
+        <td style="padding: 0.3em 1em; text-align: center;">yes</td>
+        <td style="padding: 0.3em 1em; text-align: center;"><span class="katex-inline">L_{\mathrm{attn}}(mn - \binom{n+1}{2}) + L_{\mathrm{mlp}}(mn - \binom{n}{2})</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 0.3em 1em;">Hetero-inv</td>
+        <td style="padding: 0.3em 1em; text-align: center;">no (Prop 2)</td>
+        <td style="padding: 0.3em 1em; text-align: center;">vacuous</td>
+        <td style="padding: 0.3em 1em; text-align: center;"><strong>no</strong></td>
+        <td style="padding: 0.3em 1em; text-align: center;">infeasible</td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>
+  The MLP column reads "vacuous" because neither Stiefel nor DGram satisfies strict non-degeneracy for the MLP module (GELU saturation can zero out individual feature gradients on either manifold). The feasibility constraint is therefore determined entirely by the attention column. Among the two feasible assignments (All Stiefel and Hetero), Hetero has strictly higher total expressiveness because DGram contributes <span class="katex-inline">n</span> extra dimensions per MLP weight matrix. The framework predicts Hetero as optimal, which matches the experiment.
+</p>
+
+<p>
+  <strong>What the framework does not explain.</strong> We want to be precise about where this analysis stops being rigorous.
+</p>
+
+<p>
+  First, the expressiveness measure <span class="katex-inline">\mathrm{expr}(\mathcal{M}) = \dim T_W \mathcal{M}</span> counts degrees of freedom but says nothing about which degrees of freedom are useful for a given task. A manifold with many tangent dimensions could still perform poorly if the extra dimensions correspond to directions that the loss landscape does not reward. A richer definition of expressiveness, perhaps one that incorporates the loss landscape or the data distribution, would be needed to make the objective more predictive.
+</p>
+
+<p>
+  Second, the non-degeneracy condition for the MLP module is vacuously satisfied by both manifolds, so the framework does not actually prove that DGram is better than Stiefel for MLPs. It only predicts this through the expressiveness tiebreaker. The 0.014-nat gap between Hetero and All Stiefel in Table 4 is consistent with this prediction, but we have not proven that the gap is caused by the extra tangent dimensions.
+</p>
+
+<p>
+  Third, we have only tested the framework on two manifolds and two module types. Whether it extends to other manifolds (Oblique, Flag manifolds, products of Grassmannians), other module types (convolutions, gated linear units, mixture of experts), or other architectures (state space models, vision transformers) is entirely open.
+</p>
+
+<h3>Concrete next steps</h3>
+
+<p>
+  Several extensions follow naturally from the work in this post.
+</p>
+
+<p>
+  <strong>Multi-seed verification.</strong> The Hetero-vs-Stiefel gap of 0.014 nats and the divergence onset steps (16k for All DGram, 20k for Hetero-inv) should be verified across multiple seeds. If the gap is robust, it would strengthen the expressiveness argument. If the divergence onset step is stable, it would suggest a deterministic mechanism rather than a noise-triggered instability.
+</p>
+
+<p>
+  <strong>ADMM inner loop.</strong> Buchanan <a href="#ref-buchanan">[8]</a> showed that ADMM achieves more than 2x wall-clock speedup over dual ascent for the manifold Muon subproblem. Combining ADMM with our 20-step early stopping and heterogeneous manifold assignment is a natural integration. The per-step overhead of Hetero (8.3x relative to Unconstrained) could potentially drop to 4x, making Manifold Muon competitive with Muon in practical training pipelines.
+</p>
+
+<p>
+  <strong>Larger models.</strong> GPT-2 small (124M) is a proof of concept. The DGram-on-attention failure mode is driven by spectral norm growth in the attention weights, which is a structural property of scaled dot-product attention and should not depend on model size. We expect the same qualitative finding (attention prefers Stiefel, MLPs prefer DGram) to hold at 350M and beyond. Gu and Xie <a href="#ref-mano">[10]</a> have shown that manifold-inspired methods work at 1.3B scale with soft constraints; testing hard constraints at the same scale is the obvious next experiment.
+</p>
+
+<p>
+  <strong>Per-head manifold assignment.</strong> In this post, all attention heads in a layer share the same manifold. But attention heads are known to specialize (some attend locally, some attend to specific syntactic patterns), and different heads might prefer different constraints. The manifold assignment problem formulated above naturally extends to per-head assignment by treating each head's Q, K, V, O matrices as separate modules.
+</p>
+
+    <h2>Citation</h2>
+    <div class="citation-box">
+    @misc{yoshihara2026manifoldmuon,<br>
+    &nbsp;&nbsp;title={Different Layers, Different Manifolds: Scaling Manifold Muon to GPT-2},<br>
+    &nbsp;&nbsp;author={Kirato Yoshihara},<br>
+    &nbsp;&nbsp;year={2026},<br>
+    &nbsp;&nbsp;url={https://kiratoyoshihara.github.io/essays/manifold-muon.html}<br>
+    }
+    </div>
+
+  <h2>References</h2>
+  <ol style="font-size: 0.95rem; line-height: 1.6; padding-left: 1.5rem;">
+    <li id="ref-muon" style="margin-bottom: 0.8rem;">
+      Jordan, K., Jin, Y., Boza, V., Jiacheng, Y., Cesista, F., Newhouse, L., and Bernstein, J.
+      Muon: An optimizer for hidden layers in neural networks. 2024.
+      <a href="https://kellerjordan.github.io/posts/muon/">https://kellerjordan.github.io/posts/muon/</a>
+    </li>
+    <li id="ref-moonshot" style="margin-bottom: 0.8rem;">
+      Liu, J., Su, J., Yao, X., Jiang, Z., Lai, G., Du, Y., Qin, Y., Xu, W., Lu, E., Yan, J., et al.
+      Muon is scalable for LLM training. 2025.
+      <a href="https://arxiv.org/abs/2502.16982">https://arxiv.org/abs/2502.16982</a>
+    </li>
+    <li id="ref-manifold-muon" style="margin-bottom: 0.8rem;">
+      Bernstein, J. Modular manifolds. Thinking Machines Lab blog, 2025.
+      <a href="https://thinkingmachines.ai/blog/modular-manifolds/">https://thinkingmachines.ai/blog/modular-manifolds/</a>
+    </li>
+    <li id="ref-gram-space" style="margin-bottom: 0.8rem;">
+      Keigwin B.,  Pai D.,  Chen N. Gram-space: A weaker manifold constraint for neural network training. Tilde Research blog, 2025.
+      <a href="https://blog.tilderesearch.com/vignettes/gram-space">https://blog.tilderesearch.com/vignettes/gram-space</a>
+    </li>
+    <li id="ref-nanogpt" style="margin-bottom: 0.8rem;">
+      Karpathy, A. nanoGPT. 2022.
+      <a href="https://github.com/karpathy/nanoGPT">https://github.com/karpathy/nanoGPT</a>
+    </li>
+    <li id="ref-manifold-muon-implementation" style="margin-bottom: 0.8rem;">
+      Bernstein, J. Modular manifolds 2025. Code implementation.
+      <a href="https://github.com/thinking-machines-lab/manifolds/blob/main/src/manifold_muon.py">https://github.com/thinking-machines-lab/manifolds/blob/main/src/manifold_muon.py</a>
+    </li>
+    <li id="ref-AdamW" style="margin-bottom: 0.8rem;">
+      Loshchilov, I., Hutter, F. Decoupled Weight Decay Regularization. 2019.
+      <a href="https://openreview.net/forum?id=Bkg6RiCqY7">https://openreview.net/forum?id=Bkg6RiCqY7</a>
+    </li>
+    <li id="ref-su" style="margin-bottom: 0.8rem;">
+    Su, J.  Stiefel Muon. Kexue.fm blog, 2025.
+    <a href="https://kexue.fm/archives/11221">https://kexue.fm/archives/11221</a>
+    </li>
+    <li id="ref-cesista" style="margin-bottom: 0.8rem;">
+      Cesista, F. L. Steepest descent on the Stiefel manifold. Ponder blog, 2025.
+      <a href="https://leloykun.github.io/ponder/steepest-descent-stiefel/">https://leloykun.github.io/ponder/steepest-descent-stiefel/</a>
+    </li>
+    <li id="ref-buchanan" style="margin-bottom: 0.8rem;">
+      Buchanan, S. D. A faster Manifold Muon with ADMM. Blog post, 2025.
+      <a href="https://sdbuchanan.com/blog/manifold-muon/">https://sdbuchanan.com/blog/manifold-muon/</a>
+    </li>
+    <li id="ref-mcsd" style="margin-bottom: 0.8rem;">
+      Manifold constrained steepest descent. 2026.
+      <a href="https://arxiv.org/abs/2601.21487">https://arxiv.org/abs/2601.21487</a>
+    </li>
+    <li id="ref-mano" style="margin-bottom: 0.8rem;">
+      Gu, Y. and Xie, Z. Mano: Restriking manifold optimization for LLM training. 2026.
+      <a href="https://arxiv.org/abs/2601.23000">https://arxiv.org/abs/2601.23000</a>
+    </li>
+    <li id="ref-asgo" style="margin-bottom: 0.8rem;">
+      An, K. et al. ASGO: Adaptive structured gradient optimization. 2025.
+      <a href="https://arxiv.org/abs/2503.20762">https://arxiv.org/abs/2503.20762</a>
+    </li>
+  </ol>
+
+  </article>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="document.querySelectorAll('.katex-inline').forEach(el => katex.render(el.textContent, el, {throwOnError: false}));"></script>
+</body>
+</html>
