@@ -491,9 +491,8 @@
     <figure style="margin: 1.5em auto;">
       <img src="assets/manifold-muon/optimal_alpha_scaling.svg" alt="Optimal alpha vs matrix size, log-log plot, with fitted power law." style="display: block; margin: 0 auto; max-width: 100%;">
       <figcaption style="font-style: normal; font-size: 0.9rem; color: var(--fg-dim); margin-top: 0.6em; text-align: center;">
-        Figure 1: Grid-searched optimal <span class="katex-inline">\alpha</span> (filled dots) against matrix size on log-log axes, with the fitted power law <span class="katex-inline">\alpha = 0.003 \cdot n^{0.67}</span> overlaid (dashed line). The fit spans <span class="katex-inline">n \in [32, 1024]</span> and has <span class="katex-inline">r^2 = 0.74</span>. The <span class="katex-inline">n = 16</span> point (open circle) is shown for completeness but excluded from the fit. Each point averages over 10 seeds.
-      </figcaption>
-    </figure>
+        Figure 1: Grid-searched optimal <span class="katex-inline">\alpha</span> (filled dots) against matrix size on log-log axes, with the fitted power law <span class="katex-inline">\alpha = 0.003 \cdot n^{0.67}</span> overlaid (solid line). The shaded band shows <span class="katex-inline">\pm 1</span> residual standard deviation in log space. The fit spans <span class="katex-inline">n \in [32, 1024]</span> and has <span class="katex-inline">r^2 = 0.74</span>. The <span class="katex-inline">n = 16</span> point (open circle) is shown for completeness but excluded from the fit. Each point averages over 10 seeds.      </figcaption>
+      </figure>
 
     <p>
       The more useful way to read this is in terms of Bernstein's default <span class="katex-inline">\alpha = 0.01</span>, with the caveat that the tangent violation <span class="katex-inline">\|H\|_{\text{RMS}}</span> is an internal convergence metric for dual ascent, not a direct measure of training quality. The retraction step that follows dual ascent partly absorbs violation error (we quantify this in the next section), and the Muon optimizer itself tolerates orthogonalization error up to <span class="katex-inline">\epsilon \approx 0.3</span> without training degradation <a href="#ref-muon">[1]</a>. So the numbers below describe how close dual ascent gets to its own optimality condition, not how close the resulting update is to the true steepest-descent direction.
