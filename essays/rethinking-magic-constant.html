@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rethinking 0x5F3759DF for GPUs — Kirato Yoshihara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet">  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --fg-dim: #6b6b6b;
+      --bg: #faf9f6;
+      --accent: #6495ED;
+      --rule: #d4d0c8;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 1.15rem;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Nav (same as main site) --- */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(250,249,246,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--rule);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 3rem;
+      gap: 2.5rem;
+    }
+    nav li a {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav li a:hover { color: var(--accent); }
+    nav li a.active { color: var(--fg); font-weight: 600; }
+
+    /* --- Article --- */
+    article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 7rem 2rem 6rem;
+    }
+
+    .article-date {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .article-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0.3rem 0 0.2rem;
+    }
+    .article-subtitle {
+      color: var(--fg-dim);
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .article-author {
+      font-size: 0.95rem;
+      color: var(--fg-dim);
+      margin-bottom: 2.5rem;
+    }
+    .article-author a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .article-author a:hover { border-bottom-color: var(--accent); }
+
+    hr.section-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--fg-dim);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    p { margin-bottom: 1.2rem; }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    a:hover { border-bottom-color: var(--accent); }
+
+    figure {
+      margin: 2rem 0;
+    }
+    figure img {
+      width: 100%;
+      border-radius: 2px;
+    }
+    figcaption {
+      font-size: 0.88rem;
+      color: var(--fg-dim);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    pre {
+      background: #f0eeea;
+      border-radius: 3px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+    }
+
+    .citation-box {
+      background: #f0eeea;
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      border-radius: 0 3px 3px 0;
+      margin: 1.5rem 0;
+      user-select: all;
+    }
+
+    .back-link {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--fg-dim);
+      margin-bottom: 2rem;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .katex {
+      font-size: 0.95em;
+      font-weight: normal;
+    }
+
+    @media (max-width: 768px) {
+      nav ul { padding: 0.7rem 1.5rem; gap: 1.5rem; }
+      article { padding: 5rem 1.5rem 4rem; }
+      .article-title { font-size: 1.6rem; }
+    }
+
+    /* Allow figures to break out of the 640px column */
+    figure.wide {
+      width: 100vw;
+      max-width: 900px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+    figure.wide img { width: 100%; }
+
+    pre[class*="language-"] {
+      background: #f0eeea !important;
+      color: var(--fg) !important;
+      border-radius: 3px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+      text-shadow: none !important;
+    }
+
+    code[class*="language-"] {
+      background: transparent !important;
+      color: var(--fg) !important;
+      font-family: var(--mono);
+      font-size:  0.9rem;
+      text-shadow: none !important;
+    }
+
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata {
+      color: #8a8178;
+    }
+
+    .token.keyword,
+    .token.storage {
+      color: #7b5fa3;
+    }
+
+    .token.function {
+      color: #3f6f9f;
+    }
+
+    .token.number,
+    .token.constant {
+      color: #b36b2c;
+    }
+
+    .token.string,
+    .token.char {
+      color: #5b7f3a;
+    }
+
+    .token.operator,
+    .token.punctuation {
+      color: #555;
+    }
+
+    pre[class*="language-"] .token,
+    code[class*="language-"] .token {
+      background: transparent !important;
+      text-shadow: none !important;
+    }
+
+    pre[class*="language-"] .token.operator,
+    pre[class*="language-"] .token.punctuation,
+    pre[class*="language-"] .token.entity,
+    pre[class*="language-"] .token.url,
+    code[class*="language-"] .token.operator,
+    code[class*="language-"] .token.punctuation,
+    code[class*="language-"] .token.entity,
+    code[class*="language-"] .token.url {
+      background: transparent !important;
+      color: #555 !important;
+    }
+
+    table.result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    table.result-table th,
+    table.result-table td {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.45rem 0.5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    table.result-table th {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      font-weight: 400;
+    }
+
+    table.result-table td.num {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .table-caption {
+      font-size: 0.88rem;
+      color: var(--fg-dim);
+      font-style: normal;
+      margin-top: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+  </style>
+</head>
+
+  <body>
+
+  <article>
+    <a href="../index.html#page-essays"" class="back-link">← back</a>
+
+    <div class="article-date">5/13 2026</div>
+    <h1 class="article-title">Rethinking 0x5F3759DF for GPUs</h1>
+    <p class="article-subtitle">The old spell was 0x5F3759DF. We recast it for GPUs, FP16/BF16, and RMSNorm, and discovered that modern magic may need a lookup table.</p>
+    <p class="article-author">
+      <a href="/kiratoyoshihara.github.io/">Kirato Yoshihara</a>
+    </p>
+
+    <h2>Introduction</h2>
+    <!--
+    Write the hook: 0x5F3759DF was a scalar CPU-era trick.
+    State the new question: what should Q_rsqrt-style approximation look like for GPUs, FP16/BF16, and ML kernels?
+    Preview the main result: FP32 no longer wins, but low-precision magic constants + tiny LUTs create an interesting accuracy-throughput trade-off.
+    -->
+    <p>
+    The most famous magic number in game programming is probably <code>0x5F3759DF</code>.
+    It appeared in the fast inverse square root routine popularized by Quake III Arena, where a floating-point number was reinterpreted as an integer, shifted, subtracted from a mysterious constant, and refined with one Newton step.
+    For its time, it was a beautiful scalar CPU trick: approximate <span class="katex-inline">1/\sqrt{x}</span> without paying the full cost of a square root.
+    </p>
+
+    <p>
+    But GPUs changed the question. Modern NVIDIA hardware already has fast reciprocal-square-root instructions, and ML workloads often run in FP16, BF16, or even lower precision. So instead of asking whether the original Quake trick is still useful as-is, I wanted to ask a slightly different question: what should a <code>Q_rsqrt</code>-style approximation look like in the GPU and low-precision ML era?
+    </p>
+
+    <p>
+    The short answer is that FP32 is no longer where the old trick shines. On A100, the classic bit hack does not clearly beat native GPU math. But in FP16 and BF16, the story becomes more interesting. Because the input spaces are small enough to search directly, we can find format-specific magic constants, then improve them with tiny mantissa-conditioned lookup tables. The result is not a replacement for native <code>rsqrt</code> in accuracy, but a compact accuracy-throughput trade-off for low-precision GPU kernels.
+    </p>
+
+    <h2>What Q_rsqrt Was Doing</h2>
+    <!--
+    Briefly explain the original Quake inverse square root:
+    bit reinterpretation, exponent-as-log intuition, magic constant, and one Newton step.
+    Keep this intuitive, not overly mathematical.
+    -->
+    <p>
+    The original routine is short enough to fit on a postcard.
+    </p>
+
+  <pre><code class="language-c">float Q_rsqrt( float number ) {
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5F;
+
+    x2 = number * 0.5F;
+    y  = number;
+    i  = * ( long * ) &y;         // evil floating point bit level hacking
+    i  = 0x5f3759df - ( i >> 1 );   // what the fuck?
+    y  = * ( float * ) &i;   
+    y  = y * ( threehalfs - ( x2 * y * y ) );  // 1st iteration
+ // y  = y * ( threehalfs - ( x2 * y * y ) );  // 2nd iteration, this can be removed
+
+    return y;
+}</code></pre>
+
+    <p>
+    The strange line is not the Newton step. It is this one:
+    </p>
+
+    <pre><code class="language-c">i = 0x5f3759df - (i >> 1);</code></pre>
+
+    <p>
+    A positive float stores a number using an exponent and a mantissa.
+    Very roughly, the exponent tells us the scale of the number, which means it behaves a little like <span class="katex-inline">\log_2 x</span>.
+    If we reinterpret the float bits as an integer, the integer is not equal to <span class="katex-inline">\log_2 x</span>, but it carries a surprisingly useful affine approximation to it.
+    </p>
+
+    <pre><code class="language-c">float32 bit layout
+
+    sign | exponent | mantissa
+     1   |    8     |    23
+
+    x ≈ (1 + mantissa) × 2^(exponent - 127)
+    </code></pre>
+
+    <p>
+    Here, <code>127</code> is the exponent bias for FP32. As we will see later, FP16 and BF16 use different biases, but the exact same core mechanism applies.
+    To compute <span class="katex-inline">1/\sqrt{x}</span>, we want something like <span class="katex-inline">- \frac{1}{2}\log_2 x</span> in log space.
+    The shift <code>i >> 1</code> approximately divides the encoded exponent information by two, and subtracting from the magic constant flips the sign and places the result back into the range of a floating-point number.
+    Reinterpreting those bits as a float gives an initial guess.
+    </p>
+
+    <p>
+    That initial guess is only rough, so the code applies one Newton refinement:
+    </p>
+
+    <pre><code class="language-c">y = y * (threehalfs - x2 * y * y);</code></pre>
+
+    <p>
+    This step is what turns a crude bit-level estimate into a useful approximation.
+    The magic constant chooses the starting point. Newton's method cleans it up.
+    </p>
+
+    <h2>FP32 on A100: The Old Hack No Longer Wins</h2>
+    <!--
+    Compare 1/sqrtf, rsqrtf, Quake, Lomont, and rsqrt.approx + Newton.
+    State that FP32 Quake/Lomont are not faster on A100 and are much less accurate.
+    Also include the float64-reference accuracy baseline:
+    native rsqrt max relative error is around 1e-7, while Q_rsqrt-style approximations after Newton are around 1e-3.
+    Make clear that native rsqrt is orders of magnitude more accurate.
+    -->
+    <p>
+    The first question was whether the original trick still matters for FP32 on modern GPUs.
+    I compared five variants on an NVIDIA A100-SXM4-40GB: plain <code>1.0f / sqrtf(x)</code>, CUDA <code>rsqrtf(x)</code>, the original Quake constant <code>0x5f3759df</code> with one Newton step, Lomont's improved constant <code>0x5f375a86</code> with one Newton step, and native <code>rsqrt.approx.ftz.f32</code> followed by one Newton step.
+    Each kernel was warmed up before timing, then measured over 10 runs.
+    </p>
+
+    <p>
+    For the improved constant, I used Lomont's <code>0x5f375a86</code> <a href="#ref-lomont">[1]</a>, which was obtained by numerically searching for a better constant after one Newton step.
+    Lomont also discusses why the best initial approximation is not necessarily the best constant after Newton refinement.
+    </p>
+
+    <p class="table-caption">
+    Table 1. FP32 inverse-square-root baselines on an NVIDIA A100. Errors are measured relative to torch.rsqrt. CUDA rsqrtf is the native baseline, so its error is zero by definition. In this setup, 1.0f / sqrtf(x) produced the same outputs as torch.rsqrt. The Quake-style variants match native throughput but lose accuracy.    
+    </p>
+
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Avg time on A100</th>
+          <th>Max relative error vs <code>torch.rsqrt</code> baseline</th>        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>1.0f / sqrtf(x)</code></td>
+          <td class="num">0.8520 ms</td>
+          <td class="num">0.0</td>
+        </tr>
+        <tr>
+          <td><code>CUDA rsqrtf(x)</code></td>
+          <td class="num">0.8467 ms</td>
+          <td class="num">0 by definition</td>
+        </tr>
+        <tr>
+          <td><code>Quake 0x5f3759df + Newton</code></td>
+          <td class="num">0.8546 ms</td>
+          <td class="num">1.7523e-3</td>
+        </tr>
+        <tr>
+          <td><code>Lomont 0x5f375a86 + Newton</code></td>
+          <td class="num">0.8547 ms</td>
+          <td class="num">1.7513e-3</td>
+        </tr>
+        <tr>
+          <td><code>rsqrt.approx.ftz.f32 + Newton</code></td>
+          <td class="num">1.0820 ms</td>
+          <td class="num">1.5895e-7</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br>
+    <p>
+    The result was not subtle. On A100, the classic Quake-style bit hack does not clearly beat native GPU math in FP32. The Quake and Lomont variants run at roughly the same speed as <code>sqrtf</code> and <code>rsqrtf</code>, but their maximum relative error is around <span class="katex-inline">1.75 \times 10^{-3}</span>.
+    </p>
+
+    <p>
+    I also measured accuracy against a float64 reference for the low-precision experiments. In that setting, native GPU <code>rsqrt</code> has maximum relative error around <span class="katex-inline">1.25 \times 10^{-7}</span>, while Q_rsqrt-style approximations after one Newton step are in the <span class="katex-inline">10^{-3}</span> range. So native <code>rsqrt</code> is orders of magnitude more accurate.
+    </p>
+
+    <p>
+    This does not make the old idea useless. It just changes where the interesting question lives. For FP32, the scalar CPU-era trick no longer has an obvious advantage. But for FP16, BF16, and ML-shaped kernels, the input space is smaller, the precision target is different, and the design space opens up again.
+    </p>
+
+    <h2>Searching FP16/BF16 Magic Constants</h2>
+    <!--
+    Explain that FP16/BF16 have small enough input spaces to brute-force positive normal values.
+    Report the discovered constants:
+    FP16 initial: 0x59bb
+    FP16 after Newton: 0x59ba
+    BF16 initial/Newton: 0x5f37
+    Emphasize that BF16 0x5f37 looks like the prefix of 0x5f3759df.
+    -->
+    <p>
+    The FP32 space is too large to brute-force casually, but FP16 and BF16 are small enough to search directly.
+    For each format, I enumerated all positive normal inputs, tried every 16-bit candidate constant <code>C</code>, and evaluated the Q_rsqrt-style approximation:
+    </p>
+
+    <pre><code class="language-c">i = C - (i &gt;&gt; 1);
+    y = reinterpret_as_float(i);</code></pre>
+
+    <p>
+    I searched two objectives: the quality of the initial bit-level approximation, and the quality after one Newton refinement.
+    The objective was the maximum relative error over all positive normal values in the format.
+    </p>
+
+    <p class="table-caption">
+    Table 2. Brute-force magic constant search over all positive normal FP16 and BF16 inputs. The best constant for the initial approximation is not always the best constant after Newton refinement.
+    </p>
+
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>Format</th>
+          <th>Objective</th>
+          <th>Best constant</th>
+          <th>Max relative error</th>
+          <th>Mean relative error</th>
+          <th>p99 relative error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>FP16</code></td>
+          <td>Initial approximation</td>
+          <td class="num"><code>0x59bb</code></td>
+          <td class="num">3.4502e-2</td>
+          <td class="num">2.3438e-2</td>
+          <td class="num">3.4407e-2</td>
+        </tr>
+        <tr>
+          <td><code>FP16</code></td>
+          <td>After Newton</td>
+          <td class="num"><code>0x59ba</code></td>
+          <td class="num">1.7939e-3</td>
+          <td class="num">9.3828e-4</td>
+          <td class="num">1.7517e-3</td>
+        </tr>
+        <tr>
+          <td><code>BF16</code></td>
+          <td>Initial approximation</td>
+          <td class="num"><code>0x5f37</code></td>
+          <td class="num">3.5797e-2</td>
+          <td class="num">2.2991e-2</td>
+          <td class="num">3.5324e-2</td>
+        </tr>
+        <tr>
+          <td><code>BF16</code></td>
+          <td>After Newton</td>
+          <td class="num"><code>0x5f37</code></td>
+          <td class="num">1.8992e-3</td>
+          <td class="num">9.3434e-4</td>
+          <td class="num">1.8497e-3</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+    The BF16 result is the most visually satisfying one. The best constant is <code>0x5f37</code>, which looks like the prefix of the original Quake constant:
+    </p>
+
+    <pre><code class="language-c"> FP32 Quake constant:  0x5f3759df
+ BF16 searched value:  0x5f37</code></pre>
+
+    <p>
+    This does not mean BF16 simply inherits the FP32 constant. It means the same bit-level structure survives in a smaller format.
+    For BF16, the exponent layout is close enough to FP32 that the optimal 16-bit constant lands exactly on the familiar-looking prefix.
+    </p>
+
+    <p>
+    Another small lesson is that the best initial approximation is not necessarily the best constant after Newton refinement.
+    For FP16, the initial minimax constant is <code>0x59bb</code>, while the best constant after one Newton step is <code>0x59ba</code>.
+    This mirrors the older FP32 story: the magic number should be optimized for the computation we actually run, not only for the initial guess.
+    </p>
+
+    <h2>From One Magic Constant to a Tiny LUT</h2>
+    <!--
+    Introduce mantissa-bucket correction:
+    i = C - (i >> 1);
+    i += lut[mantissa_bucket];
+    Explain that this turns one global magic constant into a tiny correction table.
+    Report that 16/32-entry LUTs reduce max and mean error.
+    -->
+
+    <h2>Accuracy and Throughput on A100</h2>
+    <!--
+    Combine the main accuracy-throughput result.
+    Mention that magic-only and magic+Newton are close to native rsqrt throughput.
+    Mention that LUT+Newton has small overhead but improves error.
+    Use representative numbers for FP16 and BF16.
+    -->
+
+    <h2>RMSNorm-like Inputs</h2>
+    <!--
+    Explain the ML-shaped test:
+    r = mean(x_i^2) + eps
+    scale = 1 / sqrt(r)
+    Report that LUT+Newton improves mean and p99 error on RMSNorm-like distributions.
+    Use hidden_dim=4096 as the representative example.
+    -->
+
+    <h2>What This Does Not Claim</h2>
+    <!--
+    State limitations:
+    This does not beat native rsqrt in accuracy.
+    This does not yet prove end-to-end Transformer speedup.
+    Results are mainly A100-based.
+    This is an exploratory design-space study.
+    -->
+
+    <h2>Conclusion</h2>
+    <!--
+    Close with the main message:
+    0x5F3759DF was one magic constant for scalar CPUs.
+    For GPU low-precision ML workloads, the natural successor may be format-specific constants plus tiny mantissa-conditioned LUTs.
+    -->
+ 
+
+
+    <h2>Citation</h2>
+    <div class="citation-box">
+    @misc{yoshihara2026rethinkingrsqrt,<br>
+    &nbsp;&nbsp;title={Rethinking 0x5F3759DF for GPUs},<br>
+    &nbsp;&nbsp;author={Kirato Yoshihara},<br>
+    &nbsp;&nbsp;year={2026},<br>
+    &nbsp;&nbsp;url={https://kiratoyoshihara.github.io/essays/rethinking-0x5f3759df.html}<br>
+    }
+    </div>
+
+    <h2>References</h2>
+
+    <ol class="references">
+      <li id="ref-lomont">
+        Chris Lomont.
+        <em>Fast Inverse Square Root</em>.
+        2003.
+        <a href="https://www.lomont.org/papers/2003/InvSqrt.pdf">https://www.lomont.org/papers/2003/InvSqrt.pdf</a>.
+      </li>
+    </ol>
+
+  </article>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="document.querySelectorAll('.katex-inline').forEach(el => katex.render(el.textContent, el, {throwOnError: false}));"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-c.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>
