@@ -386,17 +386,17 @@
     Preview the main result: FP32 no longer wins, but low-precision magic constants + tiny LUTs create an interesting accuracy-throughput trade-off.
     -->
     <p>
-    The most famous magic number in game programming is probably <code>0x5F3759DF</code>.
+    The most famous magic number in game programming is probably 0x5F3759DF.
     It appeared in the fast inverse square root routine popularized by Quake III Arena <a href="#ref-quake">[1]</a>, where a floating-point number was reinterpreted as an integer, shifted, subtracted from a mysterious constant, and refined with one Newton step.
     For its time, it was a beautiful scalar CPU trick: approximate <span class="katex-inline">1/\sqrt{x}</span> without paying the full cost of a square root.
     </p>
 
     <p>
-    But GPUs changed the question. Modern NVIDIA hardware already has fast reciprocal-square-root instructions, and ML workloads often run in FP16, BF16, or even lower precision. So instead of asking whether the original Quake trick is still useful as-is, we wanted to ask a slightly different question: what should a <code>Q_rsqrt</code>-style approximation look like in the GPU and low-precision ML era?
+    But GPUs changed the question. Modern NVIDIA hardware already has fast reciprocal-square-root instructions, and ML workloads often run in FP16, BF16, or even lower precision. So instead of asking whether the original Quake trick is still useful as-is, we wanted to ask a slightly different question: what should a Q_rsqrt-style approximation look like in the GPU and low-precision ML era?
     </p>
 
     <p>
-    The short answer is that FP32 is no longer where the old trick shines. On A100, the classic bit hack does not clearly beat native GPU math. But in FP16 and BF16, the story becomes more interesting. Because the input spaces are small enough to search directly, we can find format-specific magic constants, then improve them with tiny mantissa-conditioned lookup tables. The result is not a replacement for native <code>rsqrt</code> in accuracy, but a compact accuracy-throughput trade-off for low-precision GPU kernels.
+    The short answer is that FP32 is no longer where the old trick shines. On A100, the classic bit hack does not clearly beat native GPU math. But in FP16 and BF16, the story becomes more interesting. Because the input spaces are small enough to search directly, we can find format-specific magic constants, then improve them with tiny mantissa-conditioned lookup tables. The result is not a replacement for native rsqrt in accuracy, but a compact accuracy-throughput trade-off for low-precision GPU kernels.
     </p>
 
     <h2>What Q_rsqrt Was Doing</h2>
@@ -445,9 +445,9 @@
     x ≈ (1 + mantissa) × 2^(exponent - 127)</code></pre>
 
     <p>
-    Here, <code>127</code> is the exponent bias for FP32. As we will see later, FP16 and BF16 use different biases, but the exact same core mechanism applies.
+    Here, 127 is the exponent bias for FP32. As we will see later, FP16 and BF16 use different biases, but the exact same core mechanism applies.
     To compute <span class="katex-inline">1/\sqrt{x}</span>, we want something like <span class="katex-inline">- \frac{1}{2}\log_2 x</span> in log space.
-    The shift <code>i >> 1</code> approximately divides the encoded exponent information by two, and subtracting from the magic constant flips the sign and places the result back into the range of a floating-point number.
+    The shift i >> 1 approximately divides the encoded exponent information by two, and subtracting from the magic constant flips the sign and places the result back into the range of a floating-point number.
     Reinterpreting those bits as a float gives an initial guess.
     </p>
 
@@ -473,7 +473,7 @@
     -->
     <p>
     The first question was whether the original trick still matters for FP32 on modern GPUs.
-    We compared five variants on an NVIDIA A100-SXM4-40GB: plain <code>1.0f / sqrtf(x)</code>, CUDA <code>rsqrtf(x)</code>, the original Quake constant <code>0x5f3759df</code> with one Newton step, Lomont's improved constant <code>0x5f375a86</code> <a href="#ref-lomont">[3]</a> with one Newton step, and native <code>rsqrt.approx.ftz.f32</code> followed by one Newton step.
+    We compared five variants on an NVIDIA A100-SXM4-40GB: plain 1.0f / sqrtf(x), CUDA rsqrtf(x), the original Quake constant 0x5f3759df with one Newton step, Lomont's improved constant 0x5f375a86 <a href="#ref-lomont">[3]</a> with one Newton step, and native rsqrt.approx.ftz.f32 followed by one Newton step.
     Each kernel was warmed up before timing, then measured over 10 runs.
     </p>
 
@@ -524,11 +524,11 @@
 
     <br>
     <p>
-    The result was not subtle. On A100, the classic Quake-style bit hack does not clearly beat native GPU math in FP32. The Quake and Lomont variants run at roughly the same speed as <code>sqrtf</code> and <code>rsqrtf</code>, but their maximum relative error is around <span class="katex-inline">1.75 \times 10^{-3}</span>.
+    The result was not subtle. On A100, the classic Quake-style bit hack does not clearly beat native GPU math in FP32. The Quake and Lomont variants run at roughly the same speed as sqrtf and rsqrtf, but their maximum relative error is around <span class="katex-inline">1.75 \times 10^{-3}</span>.
     </p>
 
     <p>
-    For context, we also measured the native GPU <code>rsqrt</code> accuracy against a float64 reference in the later low-precision experiments. In that setting, native GPU <code>rsqrt</code> has maximum relative error around <span class="katex-inline">1.25 \times 10^{-7}</span>, while Q_rsqrt-style approximations after one Newton step are in the <span class="katex-inline">10^{-3}</span> range. So native <code>rsqrt</code> is orders of magnitude more accurate.
+    For context, we also measured the native GPU rsqrt accuracy against a float64 reference in the later low-precision experiments. In that setting, native GPU rsqrt has maximum relative error around <span class="katex-inline">1.25 \times 10^{-7}</span>, while Q_rsqrt-style approximations after one Newton step are in the <span class="katex-inline">10^{-3}</span> range. So native rsqrt is orders of magnitude more accurate.
     </p>
 
     <p>
@@ -547,7 +547,7 @@
     -->
     <p>
     The FP32 space is too large to brute-force casually, but FP16 and BF16 are small enough to search directly.
-    For each format, we enumerated all positive normal inputs, tried every 16-bit candidate constant <code>C</code>, and evaluated the Q_rsqrt-style approximation:
+    For each format, we enumerated all positive normal inputs, tried every 16-bit candidate constant C, and evaluated the Q_rsqrt-style approximation:
     </p>
 
 <pre><code class="language-c">// Conceptual brute-force search for a 16-bit floating-point format
@@ -589,7 +589,7 @@ for (uint32_t C = 0; C < 65536; ++C) {
     </p>
 
     <p class="table-caption">
-    Table 2. Brute-force magic constant search over all positive normal FP16 and BF16 inputs. Relative errors are measured against a float64 reference, <code>1.0f / sqrtf(x)</code>, evaluated on the quantized FP16/BF16 input values. The best constant for the initial approximation is not always the best constant after Newton refinement.
+    Table 2. Brute-force magic constant search over all positive normal FP16 and BF16 inputs. Relative errors are measured against a float64 reference, 1.0f / sqrtf(x), evaluated on the quantized FP16/BF16 input values. The best constant for the initial approximation is not always the best constant after Newton refinement.
     </p>
 
     <table class="result-table">
@@ -641,7 +641,7 @@ for (uint32_t C = 0; C < 65536; ++C) {
     
     <br>
     <p>
-    The BF16 result is the most visually satisfying one. The best constant is <code>0x5f37</code>, which looks like the prefix of the original Quake constant:
+    The BF16 result is the most visually satisfying one. The best constant is 0x5f37, which looks like the prefix of the original Quake constant:
     </p>
 
     <pre><code class="language-c"> FP32 Quake constant:  0x5f3759df
@@ -654,7 +654,7 @@ for (uint32_t C = 0; C < 65536; ++C) {
 
     <p>
     Another small lesson is that the best initial approximation is not necessarily the best constant after Newton refinement.
-    For FP16, the initial minimax constant is <code>0x59bb</code>, while the best constant after one Newton step is <code>0x59ba</code>.
+    For FP16, the initial minimax constant is 0x59bb, while the best constant after one Newton step is 0x59ba.
     This mirrors the older FP32 story: the magic number should be optimized for the computation we actually run, not only for the initial guess.
     </p>
 
@@ -883,15 +883,15 @@ y = y * (1.5f - 0.5f * (x * y) * y);</code></pre>
     </table>
 
     <p>
-    The main result is that the low-precision Q_rsqrt-style kernels are close to native <code>rsqrt</code> throughput. In FP16, <code>magic only</code> and <code>magic + Newton</code> are slightly faster than native <code>rsqrt</code> in this benchmark. In BF16, they are essentially tied with native <code>rsqrt</code>.
+    The main result is that the low-precision Q_rsqrt-style kernels are close to native rsqrt throughput. In FP16, magic only and magic + Newton are slightly faster than native rsqrt in this benchmark. In BF16, they are essentially tied with native rsqrt.
     </p>
 
     <p>
-    The 32-entry LUT adds a small overhead. For FP16, <code>magic + Newton</code> took <code>1.0632 ms</code>, while <code>32-entry LUT + Newton</code> took <code>1.0820 ms</code>. For BF16, the same comparison was <code>1.0558 ms</code> versus <code>1.0796 ms</code>. In exchange, the mean relative error was roughly halved, and the maximum relative error dropped from <span class="katex-inline">1.7939 \times 10^{-3}</span> to <span class="katex-inline">1.3694 \times 10^{-3}</span> for FP16, and from <span class="katex-inline">1.8992 \times 10^{-3}</span> to <span class="katex-inline">1.4965 \times 10^{-3}</span> for BF16.
+    The 32-entry LUT adds a small overhead. For FP16, magic + Newton took 1.0632 ms, while 32-entry LUT + Newton took 1.0820 ms. For BF16, the same comparison was 1.0558 ms versus 1.0796 ms. In exchange, the mean relative error was roughly halved, and the maximum relative error dropped from <span class="katex-inline">1.7939 \times 10^{-3}</span> to <span class="katex-inline">1.3694 \times 10^{-3}</span> for FP16, and from <span class="katex-inline">1.8992 \times 10^{-3}</span> to <span class="katex-inline">1.4965 \times 10^{-3}</span> for BF16.
     </p>
 
     <p>
-    Native <code>rsqrt</code> is still far more accurate. The point is not to replace it as a high-accuracy primitive. The point is that, in low precision, a tiny table can move the Q_rsqrt-style approximation along a useful accuracy-throughput frontier with only a small extra cost.
+    Native rsqrt is still far more accurate. The point is not to replace it as a high-accuracy primitive. The point is that, in low precision, a tiny table can move the Q_rsqrt-style approximation along a useful accuracy-throughput frontier with only a small extra cost.
     </p>
 
 
@@ -911,7 +911,7 @@ y = y * (1.5f - 0.5f * (x * y) * y);</code></pre>
 scale = 1 / sqrt(r)</code></pre>
 
     <p>
-    So we also tested a simple RMSNorm-like distribution. we sampled activations from a normal distribution, computed <code>r</code>, quantized <code>r</code> to FP16 or BF16, and then measured the relative error of each inverse-square-root approximation.
+    So we also tested a simple RMSNorm-like distribution. we sampled activations from a normal distribution, computed r, quantized r to FP16 or BF16, and then measured the relative error of each inverse-square-root approximation.
     </p>
 
     <pre><code class="language-python">x = sigma * torch.randn(batch, hidden_dim)
@@ -923,7 +923,7 @@ r_bf16 = r.to(torch.bfloat16)
 scale = invsqrt_approx(r_fp16_or_bf16)</code></pre>
 
     <p>
-    As the hidden dimension grows, <code>r</code> concentrates more tightly around its expected value, so this test is closer to the values seen inside real normalization layers than a uniform sweep over all positive floats.
+    As the hidden dimension grows, r concentrates more tightly around its expected value, so this test is closer to the values seen inside real normalization layers than a uniform sweep over all positive floats.
     </p>
 
     <p class="table-caption">
@@ -1006,15 +1006,15 @@ scale = invsqrt_approx(r_fp16_or_bf16)</code></pre>
     For GPU low-precision ML workloads, the natural successor may be format-specific constants plus tiny mantissa-conditioned LUTs.
     -->
     <p>
-    The original 0x5F3759DF trick was one magic constant for scalar CPUs. On modern GPUs, that exact story no longer holds for FP32: native <code>rsqrt</code> is fast and far more accurate.
+    The original 0x5F3759DF trick was one magic constant for scalar CPUs. On modern GPUs, that exact story no longer holds for FP32: native rsqrt is fast and far more accurate.
     </p>
 
     <p>
-    But in low precision, the idea still has an interesting shape. For FP16 and BF16, format-specific constants such as <code>0x59ba</code> and <code>0x5f37</code> give reasonable Q_rsqrt-style approximations, and tiny mantissa-conditioned LUTs improve both mean and tail error with only a small throughput cost on A100.
+    But in low precision, the idea still has an interesting shape. For FP16 and BF16, format-specific constants such as 0x59ba and 0x5f37 give reasonable Q_rsqrt-style approximations, and tiny mantissa-conditioned LUTs improve both mean and tail error with only a small throughput cost on A100.
     </p>
 
     <p>
-    This does not claim to beat native <code>rsqrt</code> in accuracy, nor does it prove an end-to-end Transformer speedup. The experiments are mainly A100-based and should be read as an exploratory design-space study. Still, the result suggests a nice modern twist: the successor to one magic number may be a tiny magic table.
+    This does not claim to beat native rsqrt in accuracy, nor does it prove an end-to-end Transformer speedup. The experiments are mainly A100-based and should be read as an exploratory design-space study. Still, the result suggests a nice modern twist: the successor to one magic number may be a tiny magic table.
     </p>
 
     <h2>Citation</h2>
