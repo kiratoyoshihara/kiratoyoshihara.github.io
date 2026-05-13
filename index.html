@@ -205,10 +205,12 @@
       justify-self: center;
     }
 
-    .essay-thumb.code-thumb img {
+    .essay-thumb.code-thumb img,
+    .essay-thumb.code-thumb svg {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      display: block;
     }
 
     /* Manifold architecture thumbnail */
@@ -319,9 +321,24 @@
         <div class="section-title">Essays</div>
 
           <div class="essay-item with-thumb">
-          <a class="essay-thumb code-thumb" href="essays/chimera-kl.html">
-            <img src="essays/assets/chimera-kl/chimera_code.svg" alt="Chimera KL Estimator">
-          </a>
+            <a class="essay-thumb code-thumb" href="essays/chimera-kl.html">
+              <svg viewBox="0 0 540 150" xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="xMidYMid meet" aria-label="Chimera KL estimator">
+                <defs>
+                  <style>
+                    .mono { font-family: 'JetBrains Mono', monospace; font-size: 24px; }
+                    .comment { fill: #6B6B6B; }
+                    .code    { fill: #1A1A1A; }
+                    .blue    { fill: #6495ED; }
+                    .orange  { fill: #C9823A; }
+                  </style>
+                </defs>
+                <text x="12"  y="34"  class="mono comment"># Chimera estimator</text>
+                <text x="12"  y="76"  class="mono code">loss = k3.detach() + k1 - k1.detach()</text>
+                <text x="12"  y="126" class="mono blue"># forward: k3</text>
+                <text x="220" y="126" class="mono orange"># backward: k1</text>
+              </svg>
+            </a>
           <div>
             <div class="essay-date">4/9 2026</div>
             <div class="essay-title">
