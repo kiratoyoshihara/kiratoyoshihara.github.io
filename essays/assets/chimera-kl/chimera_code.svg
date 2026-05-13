@@ -1,0 +1,22 @@
+<svg width="520" height="150" viewBox="0 0 520 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .mono {
+        font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+        font-size: 24px;
+      }
+      .comment { fill: #6b6b6b; }
+      .code { fill: #1a1a1a; }
+      .blue { fill: #6495ED; }
+      .orange { fill: #C9823A; }
+    </style>
+  </defs>
+
+  <!-- fully transparent background -->
+
+  <text x="12" y="34" class="mono comment"># Chimera estimator</text>
+  <text x="12" y="76" class="mono code">loss = k3.detach() + k1 - k1.detach()</text>
+
+  <text x="12" y="126" class="mono blue"># forward: k3</text>
+  <text x="220" y="126" class="mono orange"># backward: k1</text>
+</svg>
