@@ -179,6 +179,46 @@
       font-size: 1rem;
       margin-top: 0.2rem;
     }
+    .essays-content {
+      max-width: 860px;
+    }
+    .essay-item.with-thumb {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 1.6rem;
+      align-items: center;
+      margin-bottom: 2.8rem;
+    }
+
+    .essay-thumb {
+      width: 220px;
+      height: 150px;
+      border-radius: 0;
+      overflow: hidden;
+      background: var(--bg);
+      border: none;
+      display: block;
+    }
+
+    .essay-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.5rem;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .essay-item.with-thumb {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+
+      .essay-thumb {
+        width: 100%;
+        height: 180px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -217,7 +257,7 @@
   </div>
 
   <div class="page" id="page-research">
-    <div class="page-content">
+    <div class="page-content essays-content">
       <div class="section">
         <div class="section-title">Publications</div>
         <div class="pub">
@@ -230,20 +270,38 @@
   </div>
 
   <div class="page" id="page-essays">
-    <div class="page-content">
+    <div class="page-content essays-content">
       <div class="section">
         <div class="section-title">Essays</div>
+        
         <div class="essay-item">
           <div class="essay-date">4/9 2026</div>
           <div class="essay-title"><a href="essays/chimera-kl.html">The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions</a></div>
           <div class="essay-desc">Schulman's k3 estimator has nice forward properties but exploding gradient variance. What if we use k3 for the forward pass and k1 for the backward?</div>
         </div>
+
         <div class="essay-item">
           <div class="essay-date">4/17 2026</div>
           <div class="essay-title"><a href="essays/manifold-muon.html">Different Layers, Different Manifolds: Scaling Manifold Muon to GPT-2</a></div>
           <div class="essay-desc">Manifold Muon constrains weights to have nice spectral properties. But which manifold should each layer live on? We tried five assignments on GPT-2 and only three survived.</div>
         </div>
-      </div>
+
+        <div class="essay-item with-thumb">
+          <a class="essay-thumb" href="essays/rethinking-magic-constant.html">
+            <img src="essays/assets/rethinking-magic-constant/surface_normals.svg" alt="Surface normal visualization for Rethinking 0x5F3759DF for GPUs">
+          </a>
+          <div>
+            <div class="essay-date">5/13 2026</div>
+            <div class="essay-title">
+              <a href="essays/rethinking-magic-constant.html">Rethinking 0x5F3759DF for GPUs</a>
+            </div>
+            <div class="essay-desc">
+              The old spell was 0x5F3759DF. We recast it for GPUs, FP16/BF16, and RMSNorm, and discovered that modern magic may need a lookup table.
+            </div>
+          </div>
+        </div>
+
+      </div> 
     </div>
   </div>
 
