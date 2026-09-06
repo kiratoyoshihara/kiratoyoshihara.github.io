@@ -128,7 +128,9 @@
     .pub { margin-bottom: 1.2rem; }
     .pub-title { font-weight: 600; }
     .pub-authors, .pub-venue { color: var(--fg-dim); font-size: 0.95rem; }
-    .pub-venue { font-style: italic; }
+    .pub-author-self { font-weight: 600; }
+    .pub-venue { font-style: normal; }
+    .pub-spotlight { color: #8C1515; }
     a {
       color: var(--accent);
       text-decoration: none;
@@ -287,8 +289,8 @@
         <div class="section">
           <div class="section-title">About</div>
           <p>
-            Hi there! I'm Kirato — a builder with research at heart, currently a final-year undergrad focusing on robotic manipulation at The University of Osaka.
-            Research intern at <a href="https://www.aist.go.jp/aist_e/about_aist/">AIST</a>, previously at <a href="https://www.preferred.jp/en">Preferred Networks</a>.
+            Hi there! I'm Kirato — a builder with research at heart, currently a final-year undergrad at The University of Osaka.
+            Currently at <a href="https://mbzuai.ac.ae/">MBZUAI</a> and <a href="https://www.aist.go.jp/aist_e/about_aist/">AIST</a>, previously at <a href="https://www.preferred.jp/en">Preferred Networks</a>.
           </p>
         </div>
         <div class="section">
@@ -307,9 +309,19 @@
       <div class="section">
         <div class="section-title">Publications</div>
         <div class="pub">
-          <div class="pub-title"><a href="https://arxiv.org/abs/2602.23782">Breaking the Data Barrier: Robust Few-Shot 3D Vessel Segmentation using Foundation Models</a></div>
-          <div class="pub-authors">Kirato Yoshihara, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
-          <div class="pub-venue">Under Review MICCAI 2026</div>
+          <div class="pub-title"><a href="https://arxiv.org/abs/2606.13276">Different Layers, Different Manifolds: Module-Wise Weight-Space Geometry in Transformer Optimization</a></div>
+          <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span></div>
+          <div class="pub-venue">Weight-Space Symmetries (WSS) @ ICML 2026</div>
+        </div>
+        <div class="pub">
+          <div class="pub-title"><a href="https://arxiv.org/abs/2602.23782">VesselBridge3D: A Foundation Model Adaptation Framework for Label-Efficient 3D Vessel Segmentation</a></div>
+          <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span>, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
+          <div class="pub-venue">SWITCH+ Workshop @ MICCAI 2026 · <strong class="pub-spotlight">Spotlight</strong></div>
+        </div>
+        <div class="pub">
+          <div class="pub-title"><a href="https://openreview.net/forum?id=vF4gJfeKOC">Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations</a></div>
+          <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span>, Hiroaki Hamade</div>
+          <div class="pub-venue">Under review at NeurReps @ NeurIPS 2026 (Extended Abstract Track)</div>
         </div>
       </div>
     </div>
