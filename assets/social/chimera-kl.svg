@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#faf9f6"/>
+  <text x="72" y="100" font-family="Menlo, monospace" font-size="20" letter-spacing="3" fill="#6b6b6b">ESSAY / APRIL 2026</text>
+  <path d="M72 140h1056" stroke="#d4d0c8"/>
+  <path d="M72 140h84" stroke="#6495ED" stroke-width="4"/>
+  <g font-family="Georgia, serif" font-size="72" fill="#1a1a1a">
+    <text x="72" y="260">The Chimera Estimator</text>
+  </g>
+  <g font-family="Georgia, serif" font-size="34" fill="#6b6b6b">
+    <text x="74" y="350">Fixing KL divergence gradients</text>
+    <text x="74" y="396">in high dimensions</text>
+  </g>
+  <path d="M72 526h1056" stroke="#d4d0c8"/>
+  <text x="72" y="577" font-family="Georgia, serif" font-size="28" fill="#1a1a1a">Kirato Yoshihara</text>
+</svg>

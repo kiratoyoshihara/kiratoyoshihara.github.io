@@ -4,6 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rethinking 0x5F3759DF for GPUs — Kirato Yoshihara</title>
+  <meta name="description" content="Revisiting fast inverse square root for GPUs, FP16/BF16, and RMSNorm, with mantissa-conditioned lookup tables and accuracy-throughput experiments on an A100.">
+  <link rel="canonical" href="https://kiratoyoshihara.github.io/essays/rethinking-magic-constant.html">
+  <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Kirato Yoshihara">
+  <meta property="og:title" content="Rethinking 0x5F3759DF for GPUs — Kirato Yoshihara">
+  <meta property="og:description" content="Revisiting fast inverse square root for GPUs, FP16/BF16, and RMSNorm, with mantissa-conditioned lookup tables and accuracy-throughput experiments on an A100.">
+  <meta property="og:url" content="https://kiratoyoshihara.github.io/essays/rethinking-magic-constant.html">
+  <meta property="og:image" content="https://kiratoyoshihara.github.io/assets/social/rethinking-magic-constant.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Rethinking 0x5F3759DF for GPUs — FP16, BF16, and RMSNorm">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rethinking 0x5F3759DF for GPUs — Kirato Yoshihara">
+  <meta name="twitter:description" content="Revisiting fast inverse square root for GPUs, FP16/BF16, and RMSNorm, with mantissa-conditioned lookup tables and accuracy-throughput experiments on an A100.">
+  <meta name="twitter:image" content="https://kiratoyoshihara.github.io/assets/social/rethinking-magic-constant.png">
+  <meta name="twitter:image:alt" content="Rethinking 0x5F3759DF for GPUs — FP16, BF16, and RMSNorm">
+  <meta property="article:author" content="https://kiratoyoshihara.github.io/">
+  <meta property="article:published_time" content="2026-05-13">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet">  
@@ -114,6 +136,11 @@
 
     a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
     a:hover { border-bottom-color: var(--accent); }
+    a:focus-visible {
+      outline: 2px solid #4169b1;
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
 
     figure {
       margin: 2rem 0;
@@ -376,7 +403,7 @@
     <h1 class="article-title">Rethinking 0x5F3759DF for GPUs</h1>
     <p class="article-subtitle">The old spell was 0x5F3759DF. We recast it for GPUs, FP16/BF16, and RMSNorm, and discovered that modern magic may need a lookup table.</p>
     <p class="article-author">
-      <a href="/kiratoyoshihara.github.io/">Kirato Yoshihara</a>
+      <a href="../index.html">Kirato Yoshihara</a>
     </p>
 
     <h2>Introduction</h2>

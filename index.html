@@ -4,6 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kirato Yoshihara</title>
+  <meta name="description" content="Kirato Yoshihara's research and essays on foundation models, efficient learning, and representation learning. At MBZUAI and AIST; previously at Preferred Networks.">
+  <link rel="canonical" href="https://kiratoyoshihara.github.io/">
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kirato Yoshihara">
+  <meta property="og:title" content="Kirato Yoshihara">
+  <meta property="og:description" content="Kirato Yoshihara's research and essays on foundation models, efficient learning, and representation learning. At MBZUAI and AIST; previously at Preferred Networks.">
+  <meta property="og:url" content="https://kiratoyoshihara.github.io/">
+  <meta property="og:image" content="https://kiratoyoshihara.github.io/assets/social/home.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Kirato Yoshihara — Research and essays">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kirato Yoshihara">
+  <meta name="twitter:description" content="Kirato Yoshihara's research and essays on foundation models, efficient learning, and representation learning. At MBZUAI and AIST; previously at Preferred Networks.">
+  <meta name="twitter:image" content="https://kiratoyoshihara.github.io/assets/social/home.png">
+  <meta name="twitter:image:alt" content="Kirato Yoshihara — Research and essays">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
@@ -15,6 +35,7 @@
       --rule: #d4d0c8;
       --serif: 'EB Garamond', Georgia, serif;
       --mono: 'JetBrains Mono', monospace;
+      --nav-height: 4.5rem;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -36,6 +57,7 @@
     }
     nav ul {
       display: flex;
+      flex-wrap: wrap;
       list-style: none;
       max-width: 1200px;
       margin: 0 auto;
@@ -43,6 +65,10 @@
       gap: 2.5rem;
     }
     nav li a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      white-space: nowrap;
       font-family: var(--mono);
       font-size: 0.82rem;
       text-transform: uppercase;
@@ -55,15 +81,16 @@
     }
     nav li a:hover { color: var(--accent); }
     nav li a.active { color: var(--fg); font-weight: 600; }
-    .page { display: none; }
-    .page.active { display: block; }
+    main, .page { scroll-margin-top: calc(var(--nav-height) + 1rem); }
+    .js .page { display: none; }
+    .js .page.active { display: block; }
     .hero {
       display: flex;
       align-items: center;
       min-height: 100vh;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 5rem 3rem 3rem;
+      padding: calc(var(--nav-height) + 1.5rem) 3rem 3rem;
       gap: 3rem;
     }
     .hero-text { flex: 1; max-width: 560px; }
@@ -75,18 +102,20 @@
     .page-content {
       max-width: 640px;
       margin: 0 auto;
-      padding: 7rem 2rem 6rem;
+      padding: calc(var(--nav-height) + 3rem) 2rem 6rem;
       min-height: 100vh;
     }
     @media (max-width: 768px) {
-      nav ul { padding: 0.7rem 1.5rem; gap: 1.5rem; }
+      nav ul { padding: 0.35rem 0.75rem; gap: 0 0.5rem; justify-content: space-between; }
+      nav li a { font-size: 0.75rem; letter-spacing: 0.03em; }
       .hero {
         flex-direction: column;
-        padding: 5rem 1.5rem 2rem;
+        padding: calc(var(--nav-height) + 1.5rem) 1.5rem 2rem;
         min-height: auto;
       }
+      .hero-visual { width: 100%; min-width: 0; }
       .hero-visual canvas { position: relative; width: 100%; height: 300px; }
-      .page-content { padding: 5rem 1.5rem 4rem; }
+      .page-content { padding: calc(var(--nav-height) + 1.5rem) 1.5rem 4rem; }
     }
     h1 {
       font-size: 2.2rem;
@@ -103,6 +132,7 @@
     .section-title {
       font-family: var(--mono);
       font-size: 0.78rem;
+      font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--fg-dim);
@@ -126,7 +156,7 @@
       line-height: 1.5;
     }
     .pub { margin-bottom: 1.2rem; }
-    .pub-title { font-weight: 600; }
+    .pub-title { font-size: 1.15rem; font-weight: 600; }
     .pub-authors, .pub-venue { color: var(--fg-dim); font-size: 0.95rem; }
     .pub-author-self { font-weight: 600; }
     .pub-venue { font-style: normal; }
@@ -138,6 +168,22 @@
       transition: border-color 0.2s;
     }
     a:hover { border-bottom-color: var(--accent); }
+    a:focus-visible, [tabindex="-1"]:focus-visible {
+      outline: 2px solid #4169b1;
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+    .skip-link {
+      position: fixed;
+      top: 0.5rem;
+      left: 0.75rem;
+      z-index: 101;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      color: var(--fg);
+      transform: translateY(-200%);
+    }
+    .skip-link:focus { transform: translateY(0); }
     .contact-links { list-style: none; padding: 0; }
     .contact-links li { margin-bottom: 0.8rem; }
     .contact-links a { font-size: 1.1rem; }
@@ -162,6 +208,7 @@
       margin-left: 1.4rem;
       margin-bottom: 0;
       font-weight: 600;
+      overflow-wrap: anywhere;
     }
     .essays-content {
       max-width: 860px;
@@ -270,31 +317,33 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-  <nav>
+  <nav aria-label="Main navigation">
     <ul>
-      <li><a class="nav-link active" data-page="home">Home</a></li>
-      <li><a class="nav-link" data-page="research">Research</a></li>
-      <li><a class="nav-link" data-page="essays">Essays</a></li>
-      <li><a class="nav-link" data-page="funfacts">Fun Facts</a></li>
-      <li><a class="nav-link" data-page="contact">Contact</a></li>
+      <li><a class="nav-link active" href="#page-home">Home</a></li>
+      <li><a class="nav-link" href="#page-research">Research</a></li>
+      <li><a class="nav-link" href="#page-essays">Essays</a></li>
+      <li><a class="nav-link" href="#page-funfacts">Fun Facts</a></li>
+      <li><a class="nav-link" href="#page-contact">Contact</a></li>
     </ul>
   </nav>
 
+  <main id="main-content" tabindex="-1">
   <div class="page active" id="page-home">
     <div class="hero">
       <div class="hero-text">
         <h1>Kirato Yoshihara</h1>
         <p class="tagline">Gradient Descent towards a big impact.</p>
         <div class="section">
-          <div class="section-title">About</div>
+          <h2 class="section-title">About</h2>
           <p>
             Hi there! I'm Kirato — a builder with research at heart, currently a final-year undergrad at The University of Osaka.
             Now at <a href="https://mbzuai.ac.ae/">MBZUAI</a> and <a href="https://www.aist.go.jp/aist_e/about_aist/">AIST</a>, previously at <a href="https://www.preferred.jp/en">Preferred Networks</a>.
           </p>
         </div>
         <div class="section">
-          <div class="section-title">Research Interests</div>
+          <h2 class="section-title">Research Interests</h2>
           <p class="interests">Foundation Models, Efficient Learning, Representation Learning</p>
         </div>
       </div>
@@ -307,19 +356,19 @@
   <div class="page" id="page-research">
     <div class="page-content essays-content">
       <div class="section">
-        <div class="section-title">Publications</div>
+        <h2 class="section-title">Publications</h2>
         <div class="pub">
-          <div class="pub-title"><a href="https://arxiv.org/abs/2606.13276">Different Layers, Different Manifolds: Module-Wise Weight-Space Geometry in Transformer Optimization</a></div>
+          <h3 class="pub-title"><a href="https://arxiv.org/abs/2606.13276">Different Layers, Different Manifolds: Module-Wise Weight-Space Geometry in Transformer Optimization</a></h3>
           <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span></div>
           <div class="pub-venue">Weight-Space Symmetries (WSS) @ ICML 2026</div>
         </div>
         <div class="pub">
-          <div class="pub-title"><a href="https://arxiv.org/abs/2602.23782">VesselBridge3D: A Foundation Model Adaptation Framework for Label-Efficient 3D Vessel Segmentation</a></div>
+          <h3 class="pub-title"><a href="https://arxiv.org/abs/2602.23782">VesselBridge3D: A Foundation Model Adaptation Framework for Label-Efficient 3D Vessel Segmentation</a></h3>
           <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span>, Yohei Sugawara, Yuta Tokuoka, Lihang Hong</div>
           <div class="pub-venue">SWITCH+ Workshop @ MICCAI 2026 · <strong class="pub-spotlight">Spotlight</strong></div>
         </div>
         <div class="pub">
-          <div class="pub-title"><a href="https://openreview.net/forum?id=vF4gJfeKOC">Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations</a></div>
+          <h3 class="pub-title"><a href="https://openreview.net/forum?id=vF4gJfeKOC">Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations</a></h3>
           <div class="pub-authors"><span class="pub-author-self">Kirato Yoshihara</span>, Hiroaki Hamade</div>
           <div class="pub-venue">Under review at NeurReps @ NeurIPS 2026 (Extended Abstract Track)</div>
         </div>
@@ -330,7 +379,7 @@
   <div class="page" id="page-essays">
     <div class="page-content essays-content">
       <div class="section">
-        <div class="section-title">Essays</div>
+        <h2 class="section-title">Essays</h2>
 
           <div class="essay-item with-thumb">
             <a class="essay-thumb code-thumb" href="essays/chimera-kl.html">
@@ -353,9 +402,9 @@
             </a>
           <div>
             <div class="essay-date">4/9 2026</div>
-            <div class="essay-title">
+            <h3 class="essay-title">
               <a href="essays/chimera-kl.html">The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions</a>
-            </div>
+            </h3>
             <div class="essay-desc">
               Schulman's k3 estimator has nice forward properties but exploding gradient variance. What if we use k3 for the forward pass and k1 for the backward?
             </div>
@@ -368,9 +417,9 @@
           </a>
           <div>
             <div class="essay-date">4/17 2026</div>
-            <div class="essay-title">
+            <h3 class="essay-title">
               <a href="essays/manifold-muon.html">Different Layers, Different Manifolds: Scaling Manifold Muon to GPT-2</a>
-            </div>
+            </h3>
             <div class="essay-desc">
               Manifold Muon constrains weights to have nice spectral properties. But which manifold should each layer live on? We tried five assignments on GPT-2 and only three survived.            </div>
           </div>
@@ -382,9 +431,9 @@
           </a>
           <div>
             <div class="essay-date">5/13 2026</div>
-            <div class="essay-title">
+            <h3 class="essay-title">
               <a href="essays/rethinking-magic-constant.html">Rethinking 0x5F3759DF for GPUs</a>
-            </div>
+            </h3>
             <div class="essay-desc">
               The old spell was 0x5F3759DF. We recast it for GPUs, FP16/BF16, and RMSNorm, and discovered that modern magic may need a lookup table.
             </div>
@@ -398,7 +447,7 @@
   <div class="page" id="page-funfacts">
     <div class="page-content">
       <div class="section">
-        <div class="section-title">Fun Facts about Me</div>
+        <h2 class="section-title">Fun Facts about Me</h2>
         <dl class="qa-list">
           <dt>Mac or Windows?</dt>
           <dd>Mac</dd>
@@ -422,7 +471,7 @@
   <div class="page" id="page-contact">
     <div class="page-content">
       <div class="section">
-        <div class="section-title">Contact</div>
+        <h2 class="section-title">Contact</h2>
         <ul class="contact-links">
           <li>
             <span class="label">Email</span>
@@ -441,19 +490,60 @@
     </div>
   </div>
 
-<script>
-document.querySelectorAll('.nav-link').forEach(function(link){
-  link.addEventListener('click', function(){
-    var target = this.getAttribute('data-page');
-    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-    document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
-    document.getElementById('page-' + target).classList.add('active');
-    this.classList.add('active');
-    window.scrollTo(0, 0);
-    if (target === 'home') { resize(); initCycle(); }
-  });
-});
+  </main>
 
+<script>
+(function() {
+  var pages = document.querySelectorAll('.page');
+  var links = document.querySelectorAll('.nav-link');
+  var titles = {
+    'page-home': 'Kirato Yoshihara',
+    'page-research': 'Research — Kirato Yoshihara',
+    'page-essays': 'Essays — Kirato Yoshihara',
+    'page-funfacts': 'Fun Facts — Kirato Yoshihara',
+    'page-contact': 'Contact — Kirato Yoshihara'
+  };
+
+  function showPage(moveFocus) {
+    var id = window.location.hash.slice(1) || 'page-home';
+    // The skip link and other document anchors keep the current section open.
+    if (!Object.prototype.hasOwnProperty.call(titles, id)) return;
+    var page = document.getElementById(id);
+    pages.forEach(function(item) { item.classList.toggle('active', item === page); });
+    links.forEach(function(link) {
+      var active = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+    document.title = titles[id];
+    if (moveFocus) {
+      var heading = page.querySelector('h1, h2');
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
+    window.scrollTo(0, 0);
+    window.dispatchEvent(new CustomEvent('pagechange', { detail: id }));
+  }
+
+  function updateNavHeight() {
+    var height = document.querySelector('nav').getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--nav-height', height + 'px');
+  }
+
+  document.documentElement.classList.add('js');
+  updateNavHeight();
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(updateNavHeight).observe(document.querySelector('nav'));
+  } else {
+    window.addEventListener('resize', updateNavHeight);
+  }
+  showPage(false);
+  window.addEventListener('hashchange', function() { showPage(true); });
+})();
+</script>
+
+<script>
 var canvas = document.getElementById('ur5e');
 var ctx = canvas.getContext('2d');
 var container = canvas.parentElement;
@@ -472,21 +562,12 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-window.addEventListener('hashchange', function() {
-  var id = location.hash.replace('#', '');
-  var page = document.getElementById(id);
-  if (page) {
-    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-    document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
-    page.classList.add('active');
-    var target = id.replace('page-', '');
-    var link = document.querySelector('[data-page="' + target + '"]');
-    if (link) link.classList.add('active');
-    if (target === 'home') { resize(); initCycle(); }
-    history.replaceState(null, '', window.location.pathname);
+window.addEventListener('pagechange', function(event) {
+  if (event.detail === 'page-home') {
+    resize();
+    initCycle();
   }
 });
-if (location.hash) window.dispatchEvent(new Event('hashchange'));
 
 function sampleLink(p1,p2,radius,count){
   var pts=[];

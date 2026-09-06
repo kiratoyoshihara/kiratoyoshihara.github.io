@@ -3,7 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Chimera Estimator — Kirato Yoshihara</title>
+  <title>The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions — Kirato Yoshihara</title>
+  <meta name="description" content="Exploring gradient variance in Monte Carlo KL estimators, and a stop-gradient construction that combines k3 forward values with k1 gradients.">
+  <link rel="canonical" href="https://kiratoyoshihara.github.io/essays/chimera-kl.html">
+  <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Kirato Yoshihara">
+  <meta property="og:title" content="The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions — Kirato Yoshihara">
+  <meta property="og:description" content="Exploring gradient variance in Monte Carlo KL estimators, and a stop-gradient construction that combines k3 forward values with k1 gradients.">
+  <meta property="og:url" content="https://kiratoyoshihara.github.io/essays/chimera-kl.html">
+  <meta property="og:image" content="https://kiratoyoshihara.github.io/assets/social/chimera-kl.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Chimera Estimator — Fixing KL divergence gradients in high dimensions">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Chimera Estimator: Fixing KL Divergence Gradients in High Dimensions — Kirato Yoshihara">
+  <meta name="twitter:description" content="Exploring gradient variance in Monte Carlo KL estimators, and a stop-gradient construction that combines k3 forward values with k1 gradients.">
+  <meta name="twitter:image" content="https://kiratoyoshihara.github.io/assets/social/chimera-kl.png">
+  <meta name="twitter:image:alt" content="The Chimera Estimator — Fixing KL divergence gradients in high dimensions">
+  <meta property="article:author" content="https://kiratoyoshihara.github.io/">
+  <meta property="article:published_time" content="2026-04-09">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -113,6 +135,11 @@
 
     a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
     a:hover { border-bottom-color: var(--accent); }
+    a:focus-visible {
+      outline: 2px solid #4169b1;
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
 
     figure {
       margin: 2rem 0;
@@ -185,13 +212,13 @@
   <body>
 
   <article>
-    <a href="../index.html#page-essays"" class="back-link">← back</a>
+    <a href="../index.html#page-essays" class="back-link">← back</a>
 
     <div class="article-date">4/9 2026</div>
     <h1 class="article-title">The Chimera Estimator</h1>
     <p class="article-subtitle">What if we used k₃ going forward and k₁ going backward?</p>
     <p class="article-author">
-      <a href="/kiratoyoshihara.github.io/">Kirato Yoshihara</a>
+      <a href="../index.html">Kirato Yoshihara</a>
     </p>
 
     <h2>Background</h2>
