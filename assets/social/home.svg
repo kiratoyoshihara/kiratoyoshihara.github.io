@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <title>Kirato Yoshihara</title>
-  <desc>Research and Essays above a thin rule with a blue accent, with Kirato Yoshihara in a large serif typeface on a warm off-white background.</desc>
+  <desc>Research and Essays above a thin rule with a blue accent, followed by Kirato Yoshihara and the tagline A builder with research at heart.</desc>
   <rect width="1200" height="630" fill="#faf9f6"/>
   <text x="72" y="100" font-family="Menlo, monospace" font-size="20" letter-spacing="3" fill="#6b6b6b">RESEARCH &amp; ESSAYS</text>
   <path d="M72 140h1056" stroke="#d4d0c8"/>
   <path d="M72 140h84" stroke="#6495ED" stroke-width="3"/>
-  <text x="72" y="335" font-family="'EB Garamond', Georgia, serif" font-size="96" font-weight="600" fill="#1a1a1a">Kirato Yoshihara</text>
+  <text x="72" y="260" font-family="Georgia, serif" font-size="72" font-weight="400" fill="#1a1a1a">Kirato Yoshihara</text>
+  <text x="74" y="350" font-family="Georgia, serif" font-size="34" font-weight="400" fill="#6b6b6b">A builder with research at heart.</text>
 </svg>
