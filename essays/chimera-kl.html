@@ -199,7 +199,7 @@
       In 2020, John Schulman wrote a lovely <a href="http://joschu.net/blog/kl-approx.html">blog post</a> about Monte Carlo estimators for KL divergence. The setup is simple: you have samples from <span class="katex-inline">q</span>, you can evaluate both <span class="katex-inline">\log p(x)</span> and <span class="katex-inline">\log q(x)</span>, and you want to estimate <span class="katex-inline">\text{KL}[q \| p]</span>. He compared three estimators, all functions of the ratio <span class="katex-inline">r = p(x)/q(x)</span>:
     </p>
     <p>
-      <span class="katex-inline">\boldsymbol{k_1 = \log r}</span> — the naive estimator. Unbiased, but half the samples come out negative even though KL is always positive. High variance.
+      <span class="katex-inline">\boldsymbol{k_1 = -\log r}</span> — the naive estimator. Unbiased, but half the samples come out negative even though KL is always positive. High variance.
     </p>
     <p>
       <span class="katex-inline">\boldsymbol{k_2 = \tfrac{1}{2}(\log r)^2}</span> — biased but remarkably low variance. It's an <a href="https://en.wikipedia.org/wiki/F-divergence">f-divergence</a> that agrees with KL up to second order when <span class="katex-inline">p \approx q</span>.
