@@ -69,6 +69,16 @@
       scroll-margin-top: 2rem;
     }
     h3 { font-size: 1.2rem; font-weight: 600; margin: 1.8rem 0 0.6rem; }
+    .story-heading { font-family: var(--serif); font-size: 1.8rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.015em; text-transform: none; text-wrap: balance; color: var(--fg); }
+    .boundary-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 4vw, 2.5rem); margin: 2rem 0; padding: 1.3rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+    .boundary-comparison dt { font-family: var(--mono); font-size: 0.72rem; line-height: 1.5; color: var(--fg-dim); }
+    .boundary-value { font-size: clamp(2.5rem, 7vw, 4rem); line-height: 1.15; letter-spacing: -0.03em; margin: 0.35rem 0 0.6rem; white-space: nowrap; }
+    .boundary-value span { font-size: 0.45em; letter-spacing: 0; }
+    .boundary-approx { margin-right: 0.15em; }
+    .boundary-unit { margin-left: 0.2em; }
+    .boundary-leak { color: #c98263; }
+    .boundary-fixed { color: var(--blue); }
+    .boundary-description { max-width: 25ch; font-size: 0.95rem; line-height: 1.45; color: var(--fg-dim); }
     figure { margin: 2rem 0; }
     figure img { display: block; width: 100%; height: auto; }
     figure.wide { width: min(900px, calc(100vw - 3rem)); margin-left: 50%; transform: translateX(-50%); }
@@ -137,11 +147,10 @@
     </figure>
 
     <h2 id="introduction">Introduction</h2>
-    <p>A docking model can put a molecule in roughly the right place and still push one of its atoms into the protein. The usual fix is force-field relaxation: let the molecule settle into a lower-energy pose. That fix worked well enough to change the question behind this project.</p>
+    <p>A docking model can get a molecule almost right and still put one atom where a protein atom already lives. The usual fix is force-field relaxation: let the molecule settle. We wanted to give it a smaller job.</p>
     <p><strong>Can a failed check tell us which parts of the molecule need to move?</strong> A clash comes with a clue: the atoms that are in the way. We want to use that clue to keep the useful parts of a pose while giving the troublesome regions enough freedom to move.</p>
+    <p>The turning point was a control that repaired a clash it was supposed to leave alone. We had been choosing which atoms could move. We also needed to check whether the others actually stayed put.</p>
     <p>On a fresh PoseX holdout, multi-component repair matched ordinary relaxation’s observed top-5 joint success with less displacement. Minimization was <strong>3.14×</strong> faster by the ratio of medians; recorded repair wall time improved by <strong>1.08×</strong>. Choosing what moves helped, but most of the speedup disappeared outside the minimizer.</p>
-
-    <p>We’ll start with a quick picture of docking, then follow the experiments from local repair and matched controls to learned scope selection—and see how much of the speedup survives across the whole pipeline.</p>
 
     <h2 id="docking">Docking, in one picture</h2>
     <p>A <em>ligand</em> is a molecule that binds to a larger molecule; here, it is a small molecule binding to a protein. Docking asks for its bound <em>pose</em>: position, orientation, and internal conformation. Those choices are coupled. Rotating a bond can clear one clash and create another.</p>
@@ -170,11 +179,11 @@
     <p>We count <em>top-5 joint success</em> when at least one of the top five poses is both near-native and valid.</p>
 
     <h2 id="headroom">A strong baseline</h2>
-    <p>We began with the public PoseX benchmark <a class="ref" href="#ref-posex">[8]</a>. Of 433 initially near-native but invalid poses, ordinary relaxation made <strong>410 valid—about 95%</strong>.</p>
-    <p>A fresh DiffDock run told the same story: ordinary relaxation raised top-5 joint success from 41 to 77 of 200 cases. So we shifted the question toward <strong>preserving that utility while moving less of the molecule</strong>.</p>
+    <p>The obvious fix set a high bar. On the public PoseX benchmark <a class="ref" href="#ref-posex">[8]</a>, ordinary relaxation made <strong>410 of 433 initially near-native but invalid poses valid—about 95%</strong>.</p>
+    <p>A fresh DiffDock run told the same story: ordinary relaxation raised top-5 joint success from 41 to 77 of 200 cases. The baseline had already done most of the rescue work. We wanted a different win: <strong>keep that docking utility while moving less of the molecule</strong>.</p>
 
     <h2 id="scope">Choosing what moves</h2>
-    <p>We call the clash a <em>witness</em>: a concrete example of where the pose violates a physical constraint. It points to a <em>repair scope</em>, the set of atoms allowed to move. Choose the scope, relax it, and check again.</p>
+    <p>A clash report comes with coordinates. We call the clash a <em>witness</em>: a concrete example of where the pose violates a physical constraint. It points to a <em>repair scope</em>, the set of atoms allowed to move. Choose the scope, relax it, and check again.</p>
     <figure class="wide" id="fig-scopes">
       <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/repair-scopes-mobile.svg" width="300" height="852"><img src="assets/verifiable-docking/repair-scopes.svg" width="900" height="284" loading="lazy" alt="Schematic ligand scopes: ordinary relaxation moves the whole ligand; one local component covers one clash; multiple components cover both clashes while freezing the middle."></picture>
       <figcaption><span class="figure-label">Figure 2.</span> Schematic scope choices within one ligand. Blue atoms may move; gray atoms stay fixed under a hard freeze; orange rings mark clashes.</figcaption>
@@ -206,23 +215,37 @@
     <span class="token keyword">return</span> candidate</code></pre>
     <p>The local check decides whether to take the fallback; the full PoseBusters suite evaluates the final output. We reserve reference-pose accuracy for evaluation.</p>
 
-    <h2 id="controls">The control that moved</h2>
-    <p>The first surprise came from the control. On 166 poses, guided and random repair both made 160 valid. Atoms outside the chosen scope could still move against a soft penalty, so even a random scope could clear the real clash.</p>
+    <h2 class="story-heading" id="controls">Our control worked. That should have been impossible.</h2>
+    <p>The guided repair made 160 of 166 poses valid. So did the random control. We were trying to show that the clash location mattered; the minimizer seemed perfectly happy without it.</p>
+    <p>Then we looked at the atoms that were supposed to stay put. Even when the control scope excluded the clashing atom, that atom was still moving.</p>
+    <dl class="boundary-comparison" id="boundary-motion" aria-label="Displacement outside the chosen repair scope">
+      <div>
+        <dt>Soft restraint</dt>
+        <dd class="boundary-value boundary-leak"><span class="boundary-approx">≈</span>0.36<span class="boundary-unit">Å</span></dd>
+        <dd class="boundary-description">Median displacement of an excluded clash atom in the random control.</dd>
+      </div>
+      <div>
+        <dt>Hard freeze</dt>
+        <dd class="boundary-value boundary-fixed">0<span class="boundary-unit">Å</span></dd>
+        <dd class="boundary-description">Maximum displacement of any frozen non-hydrogen atom.</dd>
+      </div>
+    </dl>
+    <p>The boundary was negotiable. A soft restraint puts a price on movement. If clearing a clash saves enough energy, the minimizer pays the price.</p>
     <p>Let <span class="katex-inline">x^0</span> be the starting coordinates and <span class="katex-inline">F</span> the atoms outside the movable set, including the protein. A soft restraint adds a quadratic tether of strength <span class="katex-inline">\kappa</span> to the system’s potential, <span class="katex-inline">E_0</span>:</p>
     <div class="equation" id="eq-soft" tabindex="0" role="region" aria-label="Soft restraint objective">
       <div class="math-display">E_{\mathrm{soft}}(x)=E_0(x)+\frac{\kappa}{2}\sum_{i\in F}\lVert x_i-x_i^0\rVert_2^2</div>
     </div>
-    <p>A finite penalty still lets an atom move if the rest of the energy decreases enough. Hard freezing instead constrains the optimization:</p>
+    <p>Hard freezing closes the loophole. Staying put becomes a condition of the optimization:</p>
     <div class="equation" id="eq-hard" tabindex="0" role="region" aria-label="Hard freeze constrained minimization">
       <div class="math-display">\begin{aligned}\min_x\;&E_0(x)\\\text{subject to}\;&x_i=x_i^0\quad(i\in F)\end{aligned}</div>
     </div>
     <p>In OpenMM, zero-mass particles stay fixed during minimization. We use them to enforce the boundary; each selected non-hydrogen atom brings its attached hydrogens into the movable set.</p>
-    <p>Under soft restraints, even an excluded clash atom moved by roughly 0.36 Å in the random control. Under hard freezing, the maximum frozen-heavy-atom displacement was zero.</p>
+    <p>With that boundary enforced, guided repair pulled ahead of the random and swapped controls.</p>
     <figure class="wide" id="fig-specificity">
       <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/specificity-mobile.svg" width="340" height="315"><img src="assets/verifiable-docking/specificity.svg" width="900" height="285" loading="lazy" alt="With the true clash excluded from control scopes, guided validity exceeds random by 60.9 percentage points, 95 percent interval 48.7 to 72.9, and swapped by 56.5 points, interval 43.9 to 69.3."></picture>
       <figcaption><span class="figure-label">Figure 3.</span> Guided repair’s advantage when control scopes exclude the true clash. Lines are 95% confidence intervals obtained by resampling protein targets. Each target has equal weight; the random and swapped comparisons use 127 and 119 poses, respectively.</figcaption>
     </figure>
-    <p>Once excluded atoms stayed fixed, the true clash location helped guide repair.</p>
+    <p>The control had found a loophole in our experiment. Closing it made the location signal visible.</p>
 
     <h2 id="cascade">Covering several clashes</h2>
     <p>A ligand can clash in more than one place. With a single anchor, about half the poses in a reserved test set needed ordinary relaxation as a fallback, making the full procedure slower. We gave the next operator several anchors.</p>
@@ -260,24 +283,20 @@
     <p>Minimization is only one item on the bill. Its reported speedup was <strong>3.14×</strong>; recorded repair wall time improved by <strong>1.08×</strong>. Both timings include the ordinary fallback. Detection and verification cost time too.</p>
     <p>Amdahl’s argument <a class="ref" href="#ref-amdahl">[11]</a> makes the next experiment clear: profile the whole repair. Faster local motion is useful; the next gain has to survive the surrounding work.</p>
 
-    <h2 id="learning">Learning the scope</h2>
-    <p>Could a model learn which atoms to move? We trained a graph neural network, which passes information between atoms and the constraints connecting them. For each pose, it ranked a fixed menu of repair scopes, prepared independently of the clash information.</p>
-    <p>The development study covered 106 poses across 43 protein families. Each pose was evaluated by a model trained on other families.</p>
-    <p>The test was simple: try up to three proposed repairs, stopping at the first that passes the study’s 20 checks on molecular structure and physical plausibility. Count a success only if that accepted scope allowed at most <strong>30% of the ligand’s non-hydrogen atoms</strong> to move.</p>
-    <figure class="wide" id="fig-selector">
-      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/selector-mobile.svg" width="300" height="900"><img src="assets/verifiable-docking/selector.svg" width="900" height="300" loading="lazy" alt="Small repairs that pass within three tries: 23.6 percent with the correct clash location, 2.8 percent with no location, and 1.9 percent with a wrong location. Orange marks the clash; blue marks the location supplied to the model."></picture>
-      <figcaption><span class="figure-label">Figure 5.</span> The clash location helps the model choose a small repair that passes. Orange marks the same clash; blue marks the supplied location. Each condition trains the same model architecture separately.</figcaption>
-    </figure>
-    <p>Giving the model the real clash location raised this success rate from 2.8% to <strong>23.6%</strong>. Both advantages over the controls had 95% confidence intervals above zero when we resampled whole protein families. The model had learned something useful about where to look.</p>
-    <h3>Teaching that preference</h3>
-    <p>The model predicts whether a repair will pass, how much the atoms will move, and how much work it will take. The training objective combines those predictions with a preference for useful candidate scopes:</p>
-    <div class="equation" id="eq-loss" tabindex="0" role="region" aria-label="Implemented model training loss">
-      <div class="math-display">\begin{aligned}\mathcal L={}&\mathcal L_{\mathrm{pass}}+\mathcal L_{\mathrm{order}}\\&+0.25\,\mathcal L_{\mathrm{cost}}+0.1\,\mathcal L_{\mathrm{prob}}\end{aligned}</div>
-    </div>
-    <p>The four terms learn pass/fail outcomes, order candidates, fit repair costs, and penalize probability errors. Rare passing repairs receive extra weight; cost scores are fitted on a logarithmic scale using passing candidates. Candidate ordering favors passes first, then smaller scopes, smaller edits, and less work.</p>
-    <p>After averaging predictions from five training runs, we keep candidates with pass probability <span class="katex-inline">\bar p_c\geq0.25</span>. We sort by the fraction of non-hydrogen atoms allowed to move, <span class="katex-inline">a_c</span>, then nonnegative motion and work scores, <span class="katex-inline">\widehat d_c,\widehat w_c</span>. Probability and a fixed ID break the remaining ties:</p>
-    <div class="equation" id="eq-selection" tabindex="0" role="region" aria-label="Candidate selection order"><div class="math-display">\operatorname{key}(c)=\left(a_c,\widehat d_c,\widehat w_c,-\bar p_c,\operatorname{id}_c\right).</div></div>
-    <p>The verifier makes the final acceptance decision. Table 3 tracks the remaining gap between learning where to look and choosing a small, successful repair reliably.</p>
+    <h2 id="learning">Teaching the model where to look</h2>
+    <p>We also trained a model that passes information between atoms and their constraints to rank a fixed menu of repair scopes. The development test covered 106 poses from 43 protein families, with each pose evaluated by a model trained on other families.</p>
+    <p>We counted a small repair as a success when the first accepted candidate, among at most three tries, passed the study’s 20 structure and plausibility checks while allowing at most 30% of non-hydrogen atoms to move.</p>
+    <p>Without the clash location, the success rate was <strong>2.8%</strong>. With it, <strong>23.6%</strong>. The model could learn to follow the clue.</p>
+
+    <h2 id="generalization">What still needs to travel</h2>
+    <p>The next test is on unfamiliar binding pockets. DockGen tests novel binding domains <a class="ref" href="#ref-dockgen">[12]</a>; PoseBench evaluates broader docking settings <a class="ref" href="#ref-posebench">[13]</a>. Our external studies also used Astex <a class="ref" href="#ref-astex">[14]</a> and CASP15 ligand tasks <a class="ref" href="#ref-casp15">[15]</a>.</p>
+    <p>We would keep the repair rule fixed and change the proteins: new families, new pockets, the same local decisions. Alongside that test, we need to time detection, selection, verification, and fallback with the minimizer. That is where we would look for the next speedup.</p>
+    <p>The control taught us to take <em>fixed</em> literally. Once we did, the clash became a useful instruction: start moving here.</p>
+
+    <h2 id="limitations">Limitations</h2>
+    <p>The multi-component result comes from one fresh PoseX holdout, with previously used pairs and ligand groups excluded. Transfer to new protein families remains unconfirmed. Broader external experiments encountered lower docking success, accepted poses that failed the final checks, too few test cases, or no clear advantage over control scopes.</p>
+    <p>The oracle and hard-freeze experiments serve different purposes. Table 1 uses hindsight on 106 previously examined poses selected by reference-pose accuracy; broader testing did not establish that sparse repair preserves ordinary relaxation’s performance. Hard freezing was a follow-up diagnostic after the soft-restraint test failed its planned control comparison, and its top-5 joint success remained below ordinary relaxation.</p>
+    <p>Physical validity assesses molecular geometry and plausibility, rather than establishing the true bound pose. The learned selector uses a separate 20-check protocol, distinct from the earlier full PoseBusters endpoint. Its development results missed the size and coverage targets in Table 3; reference-pose accuracy and a separate confirmation set remain unevaluated.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-label="Remaining selector targets">
       <table><caption>Table 3. What a practical selector still needs.</caption>
         <thead><tr><th scope="col">Requirement</th><th scope="col">Observed</th></tr></thead>
@@ -288,25 +307,6 @@
         </tbody>
       </table>
     </div>
-
-    <h2 id="generalization">What still needs to travel</h2>
-    <p>The next test is on unfamiliar binding pockets. DockGen tests novel binding domains <a class="ref" href="#ref-dockgen">[12]</a>; PoseBench evaluates broader docking settings <a class="ref" href="#ref-posebench">[13]</a>. Our external studies also used Astex <a class="ref" href="#ref-astex">[14]</a> and CASP15 ligand tasks <a class="ref" href="#ref-casp15">[15]</a>.</p>
-    <div class="table-scroll" tabindex="0" role="region" aria-label="Next experiments">
-      <table><caption>Table 4. The next experiments.</caption>
-        <thead><tr><th scope="col">Question</th><th scope="col">Next step</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Does repair transfer?</th><td>Keep the operator fixed; test on protein families absent from development.</td></tr>
-          <tr><th scope="row">Can the whole repair be faster?</th><td>Profile detection, selection, verification, and fallback with minimization.</td></tr>
-          <tr><th scope="row">Can the learned selector be useful?</th><td>Measure docking accuracy while reducing the number of movable atoms and the repair work.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>A clash is a useful place to start. It tells us where to give the molecule room to move. The next step is to make that repair cheap enough—and reliable enough on unfamiliar proteins—to earn a place in the docking pipeline.</p>
-
-    <h2 id="limitations">Limitations</h2>
-    <p>The multi-component result comes from one fresh PoseX holdout, with previously used pairs and ligand groups excluded. Transfer to new protein families remains unconfirmed. Broader external experiments encountered lower docking success, accepted poses that failed the final checks, too few test cases, or no clear advantage over control scopes.</p>
-    <p>The oracle and hard-freeze experiments serve different purposes. Table 1 uses hindsight on 106 previously examined poses selected by reference-pose accuracy; broader testing did not establish that sparse repair preserves ordinary relaxation’s performance. Hard freezing was a follow-up diagnostic after the soft-restraint test failed its planned control comparison, and its top-5 joint success remained below ordinary relaxation.</p>
-    <p>Physical validity assesses molecular geometry and plausibility, rather than establishing the true bound pose. The learned selector uses a separate 20-check protocol, distinct from the earlier full PoseBusters endpoint. Its development results missed the size and coverage targets in Table 3; reference-pose accuracy and a separate confirmation set remain unevaluated.</p>
     <p>Recorded wall time covers the repair call and initial clash detection, excluding docking, preparation, and surrounding scope construction. The minimization speedup compares medians, while the wall-time speedup compares sums. These ratios alone cannot identify how much time each stage takes.</p>
     <p>The optimization equations describe objectives. The control runs capped minimization at 100 iterations, and backtracking searches along one interpolation path. Neither procedure guarantees a global minimum or a globally smallest repair.</p>
 
