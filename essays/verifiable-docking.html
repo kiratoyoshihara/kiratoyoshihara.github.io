@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifiable Docking: Repairing Only What Needs to Move — Kirato Yoshihara</title>
+  <meta name="description" content="Can a physical validity check tell us which parts of a docking pose to repair? Experiments with local repair, hard freezes, and the gap between a faster minimizer and a faster pipeline.">
+  <link rel="canonical" href="https://kiratoyoshihara.github.io/essays/verifiable-docking.html">
+  <link rel="icon" href="../favicon.ico?v=2" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Kirato Yoshihara">
+  <meta property="og:title" content="Verifiable Docking: Repairing Only What Needs to Move">
+  <meta property="og:description" content="Using clash locations to choose what moves: the experiments that worked, the controls that mattered, and why a 3× minimization speedup became 1.08× for recorded repair time.">
+  <meta property="og:url" content="https://kiratoyoshihara.github.io/essays/verifiable-docking.html">
+  <meta property="og:image" content="https://kiratoyoshihara.github.io/essays/assets/verifiable-docking/hero-figure.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1536">
+  <meta property="og:image:height" content="1024">
+  <meta property="og:image:alt" content="A small molecule inside a softly illuminated blue protein binding pocket.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Verifiable Docking: Repairing Only What Needs to Move">
+  <meta name="twitter:description" content="Using clash locations to choose what moves: the experiments that worked, the controls that mattered, and why a 3× minimization speedup became 1.08× for recorded repair time.">
+  <meta name="twitter:image" content="https://kiratoyoshihara.github.io/essays/assets/verifiable-docking/hero-figure.png">
+  <meta name="twitter:image:alt" content="A small molecule inside a softly illuminated blue protein binding pocket.">
+  <meta property="article:author" content="https://kiratoyoshihara.github.io/">
+  <meta property="article:published_time" content="2026-09-08">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    :root {
+      --fg: #1a1a1a;
+      --fg-dim: #6b6b6b;
+      --bg: #faf9f6;
+      --accent: #6495ed;
+      --blue: #4169a5;
+      --rule: #d4d0c8;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--serif);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 1.15rem;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+    article { max-width: 680px; margin: 0 auto; padding: 7rem 2rem 6rem; }
+    a { color: var(--blue); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    a:hover { border-bottom-color: currentColor; }
+    a:focus-visible, [tabindex="0"]:focus-visible {
+      outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 2px;
+    }
+    .back-link { display: inline-block; font-family: var(--mono); font-size: 0.82rem; color: var(--fg-dim); margin-bottom: 2rem; }
+    .article-date { font-family: var(--mono); font-size: 0.78rem; color: var(--fg-dim); letter-spacing: 0.08em; }
+    .article-title { font-size: 2.35rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; margin: 0.6rem 0 0.9rem; text-wrap: balance; }
+    .article-subtitle { color: var(--fg-dim); font-style: italic; font-size: 1.1rem; line-height: 1.65; margin-bottom: 0.7rem; }
+    .article-author { font-size: 0.95rem; color: var(--fg-dim); margin-bottom: 2.5rem; }
+    .article-author a { color: var(--accent); }
+    p { margin-bottom: 1.2rem; }
+    h2 {
+      font-family: var(--mono); font-size: 0.78rem; font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-dim);
+      border-bottom: 1px solid var(--rule); padding-bottom: 0.5rem; margin: 3rem 0 1.2rem;
+      scroll-margin-top: 2rem;
+    }
+    h3 { font-size: 1.2rem; font-weight: 600; margin: 1.8rem 0 0.6rem; }
+    figure { margin: 2rem 0; }
+    figure img { display: block; width: 100%; height: auto; }
+    figure.wide { width: min(900px, calc(100vw - 3rem)); margin-left: 50%; transform: translateX(-50%); }
+    figcaption { font-size: 0.92rem; line-height: 1.55; color: var(--fg-dim); margin-top: 0.9rem; }
+    .figure-label { color: var(--fg); font-weight: 600; }
+    .hero-figure { margin-top: 2rem; margin-bottom: 2.5rem; }
+    .hero-figure.wide { width: min(720px, calc(100vw - 3rem)); }
+    .definitions { border-left: 2px solid var(--rule); padding-left: 1.2rem; margin: 1.5rem 0; }
+    .definitions p { margin-bottom: 0.45rem; font-size: 1rem; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.98rem; line-height: 1.5; font-variant-numeric: tabular-nums; }
+    caption { text-align: left; color: var(--fg-dim); font-size: 0.9rem; padding-bottom: 0.8rem; }
+    th { font-weight: 600; text-align: left; }
+    th, td { border-bottom: 1px solid var(--rule); padding: 0.7rem 0.65rem; vertical-align: top; }
+    th:first-child, td:first-child { padding-left: 0; }
+    th:last-child, td:last-child { padding-right: 0; }
+    .numeric { text-align: right; white-space: nowrap; }
+    .baseline-results { width: min(820px, calc(100vw - 3rem)); margin: 2rem 0 1.8rem 50%; transform: translateX(-50%); }
+    .baseline-results .table-scroll { margin: 0 0 0.7rem; }
+    .booktabs { min-width: 700px; border-top: 2px solid var(--fg); border-bottom: 2px solid var(--fg); }
+    .booktabs caption span { display: block; max-width: calc(100vw - 3rem); }
+    .booktabs th, .booktabs td { border-bottom: 0; vertical-align: middle; }
+    .booktabs thead { border-bottom: 1px solid var(--fg-dim); }
+    .booktabs thead th { vertical-align: bottom; }
+    .booktabs .timing-group { text-align: center; border-bottom: 1px solid var(--rule); padding-bottom: 0.35rem; }
+    .booktabs thead tr:last-child th { padding-top: 0.35rem; }
+    .booktabs tbody th, .booktabs tbody td { padding-top: 0.85rem; padding-bottom: 0.85rem; }
+    .table-unit { display: block; color: var(--fg-dim); font-size: 0.88em; font-weight: 400; }
+    .table-note { color: var(--fg-dim); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0; }
+    .references { padding-left: 1.3rem; font-size: 0.98rem; }
+    .references li { margin-bottom: 0.7rem; padding-left: 0.2rem; }
+    .citation-box { background: #f0eeea; border-left: 3px solid var(--accent); padding: 1rem 1.2rem; font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; border-radius: 0 3px 3px 0; margin: 1.5rem 0; white-space: pre-wrap; overflow-wrap: anywhere; user-select: all; }
+    .takeaway { border-left: 2px solid var(--accent); padding-left: 1.2rem; margin: 1.8rem 0; }
+    .takeaway p { margin: 0; }
+    .ref { font-size: 0.85em; white-space: nowrap; }
+    .table-scroll { margin: 1.8rem 0 1rem; }
+    .reading-note { font-size: 1rem; color: var(--fg-dim); }
+    .emphasis-cell { background: rgba(100,149,237,0.07); color: var(--blue); }
+    .code-heading { font-family: var(--mono); font-size: 0.7rem; color: var(--fg-dim); margin-top: 1.8rem; }
+    pre.language-python { background: #f0eeea; color: var(--fg); border-radius: 3px; padding: 1.2rem; overflow-x: auto; font-family: var(--mono); font-size: 0.78rem; line-height: 1.7; margin: 0.6rem 0 0.8rem; tab-size: 4; }
+    code.language-python { font-family: inherit; font-size: inherit; text-shadow: none; }
+    .token.comment { color: #8a8178; }
+    .token.keyword { color: #7b5fa3; }
+    .token.function { color: #3f6f9f; }
+    .equation { overflow-x: auto; padding: 0.4rem 0; margin: 1.5rem 0; text-align: center; }
+    .math-display { width: max-content; min-width: 100%; }
+    .katex { font-size: 0.95em; font-weight: normal; }
+    .equation .katex-display { margin: 0.5rem 0; }
+    .katex-inline { overflow-wrap: anywhere; }
+    .references li { scroll-margin-top: 2rem; }
+    @media (max-width: 768px) {
+      article { padding: 4rem 1.5rem; }
+      .article-title { font-size: 1.9rem; }
+      th, td { padding: 0.6rem 0.45rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+  <article>
+    <a href="../index.html#page-essays" class="back-link">← back</a>
+    <header>
+      <div class="article-date"><time datetime="2026-09-08">9/8 2026</time></div>
+      <h1 class="article-title">Verifiable Docking: Repairing Only What Needs to Move</h1>
+      <p class="article-subtitle">A docking pose can be almost right and still clash with the protein. Can the clash itself tell us what to repair?</p>
+      <p class="article-author"><a href="../index.html">Kirato Yoshihara</a></p>
+    </header>
+
+    <figure class="wide hero-figure">
+      <img src="assets/verifiable-docking/hero-figure.svg" width="1536" height="1024" fetchpriority="high" alt="A small molecule nestled in a blue binding pocket, surrounded by the pale ribbon structure of a protein.">
+    </figure>
+
+    <h2 id="introduction">Introduction</h2>
+    <p>A docking model can put a molecule in roughly the right place and still push one of its atoms into the protein. The pose is close to the experimental structure, but it fails a physical check. The usual fix is force-field relaxation. It works well enough that it changed the question behind this project.</p>
+    <p><strong>Can a failed check tell us which parts of the molecule need to move?</strong> The goal is to keep the useful parts of a pose while giving the problematic regions just enough freedom to move.</p>
+    <div class="takeaway"><p>On a fresh PoseX holdout, multi-component repair preserved ordinary relaxation’s observed top-5 joint success with less displacement. Minimization was <strong>3.14×</strong> faster by the ratio of medians; recorded repair wall time improved by <strong>1.08×</strong>. Choosing what moves helped, but most of the speedup disappeared outside the minimizer.</p></div>
+
+    <p>We’ll start with a quick picture of docking, then follow the experiments from local repair and matched controls to learned scope selection—and see how much of the speedup survives across the whole pipeline.</p>
+
+    <h2 id="docking">Docking, in one picture</h2>
+    <p>A <em>ligand</em> is a molecule that binds to a larger molecule; here, it is a small molecule binding to a protein. Docking asks for its bound <em>pose</em>: position, orientation, and internal conformation. Those choices are coupled. Rotating a bond can clear one clash and create another.</p>
+    <figure class="wide" id="fig-docking">
+      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/docking-primer-mobile.svg" width="300" height="900"><img src="assets/verifiable-docking/docking-primer.svg" width="900" height="300" loading="lazy" alt="Three schematic panels: choose a ligand pose; a near-native pose can overlap the protein; joint success requires both proximity to the reference and physical validity."></picture>
+      <figcaption><span class="figure-label">Figure 1.</span> Docking is a geometric prediction with two separate checks. Orange marks a clash; blue marks a pose satisfying both conditions. The drawings are conceptual, not structures from these experiments.</figcaption>
+    </figure>
+    <p>Different methods get to that pose differently. The distinction matters here because our intervention happens <em>after</em> a pose has been predicted.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Docking method context">
+      <table><caption>Three routes to a predicted pose. These are methodological examples, not a performance ranking.</caption>
+        <thead><tr><th scope="col">Approach</th><th scope="col">Examples</th><th scope="col">Main idea</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Search and score</th><td>AutoDock Vina <a class="ref" href="#ref-vina">[1]</a>; GNINA <a class="ref" href="#ref-gnina">[2]</a></td><td>Search candidate conformations; GNINA adds learned CNN scoring.</td></tr>
+          <tr><th scope="row">Learn the geometry</th><td>EquiBind <a class="ref" href="#ref-equibind">[3]</a>; TANKBind <a class="ref" href="#ref-tankbind">[4]</a></td><td>Predict binding geometry with equivariant or distance-based models.</td></tr>
+          <tr><th scope="row">Generate poses</th><td>DiffDock <a class="ref" href="#ref-diffdock">[5]</a></td><td>Use diffusion over translation, rotation, and torsion.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Our repair experiments start from DiffDock predictions. We evaluate accuracy against a reference and physical plausibility with the full PoseBusters suite <a class="ref" href="#ref-posebusters">[6]</a>, whose checks use the RDKit cheminformatics toolkit <a class="ref" href="#ref-rdkit">[7]</a>.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Accuracy and validity definitions">
+      <table class="validity-matrix"><caption>Two tests, four outcomes. Here “near-native” means RMSD &lt; 2 Å.</caption>
+        <thead><tr><th scope="col">Predicted pose</th><th scope="col">Fails validity</th><th scope="col">Passes validity</th></tr></thead>
+        <tbody><tr><th scope="row">Near-native</th><td>Repair opportunity</td><td class="emphasis-cell"><strong>Joint success</strong></td></tr><tr><th scope="row">Far from reference</th><td>Neither criterion met</td><td>Plausible, but inaccurate</td></tr></tbody>
+      </table>
+    </div>
+    <p class="reading-note"><strong>Top-5 joint success</strong> means at least one of the top five poses is both near-native and valid. Passing physical checks does not prove that the ligand binds in that pose.</p>
+
+    <h2 id="headroom">A strong baseline</h2>
+    <p>We began with the public PoseX benchmark <a class="ref" href="#ref-posex">[8]</a>. Of 433 initially near-native but invalid poses, ordinary relaxation made <strong>410 valid—about 95%</strong>. That is recovery within the repair cohort, rather than an overall docking success rate.</p>
+    <p>A fresh DiffDock run told the same story: ordinary relaxation raised top-5 joint success from 41 to 77 of 200 cases. So we shifted the question toward <strong>preserving that utility while moving less of the molecule</strong>.</p>
+
+    <h2 id="scope">Choosing what moves</h2>
+    <p>A clash supplies more than a failed check: it identifies a concrete location. We call that violation a <em>counterexample</em>, or <em>witness</em>. The proposal is to use it to choose a repair scope, relax that scope, and check the result again.</p>
+    <figure class="wide" id="fig-scopes">
+      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/repair-scopes-mobile.svg" width="300" height="852"><img src="assets/verifiable-docking/repair-scopes.svg" width="900" height="284" loading="lazy" alt="Schematic ligand scopes: ordinary relaxation moves the whole ligand; one local component covers one clash; multiple components cover both clashes while freezing the middle."></picture>
+      <figcaption><span class="figure-label">Figure 2.</span> Blue atoms may move; gray atoms stay fixed under a hard freeze; orange rings locate witnesses. A component is a portion of the same ligand. The diagram illustrates scope choices, not the measured active fraction or exact component decomposition of a pose.</figcaption>
+    </figure>
+    <p>Before choosing a rule, we asked an oracle how small a successful scope could be, using global OpenMM relaxation as the comparator <a class="ref" href="#ref-openmm">[9]</a>. An overly strict scope missed repairs. Expanding through coupled constraints helped; a factor graph represents those local dependencies <a class="ref" href="#ref-factorgraphs">[10]</a>.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Exploratory oracle results">
+      <table><caption>Table 1. How much freedom does repair need? Exploratory results on 106 poses.</caption>
+        <thead><tr><th scope="col">Scope</th><th scope="col" class="numeric">Valid poses</th><th scope="col">What it tells us</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Global relaxation</th><td class="numeric">94/106</td><td>A strong reference</td></tr>
+          <tr><th scope="row">Strict-local oracle</th><td class="numeric">84/106</td><td>Too little freedom</td></tr>
+          <tr><th scope="row">Sparsity-first oracle</th><td class="numeric">95/106</td><td>About 27% of heavy atoms active, at the median</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>That is encouraging headroom, but this was an already observed, RMSD-selected cohort. The broader evaluation did not establish non-inferiority. An oracle shows what might be possible; we still need a rule that chooses the scope without seeing the answer.</p>
+    <div class="code-heading">Conceptual repair cascade · Python pseudocode</div>
+    <pre class="language-python" tabindex="0" role="region" aria-label="Conceptual repair pseudocode, horizontally scrollable"><code class="language-python"><span class="token comment"># Schematic helpers, not a library API.</span>
+<span class="token keyword">def</span> <span class="token function">repair</span>(pose, protein):
+    witnesses = <span class="token function">find_clashes</span>(pose, protein)
+    scope = <span class="token function">choose_components</span>(pose, witnesses)
+    local = <span class="token function">relax</span>(pose, protein, movable=scope)
+    <span class="token keyword">assert</span> <span class="token function">unchanged_outside</span>(pose, local, scope)
+
+    <span class="token keyword">if</span> <span class="token function">verifier_passes</span>(local, protein):
+        candidate = local
+    <span class="token keyword">else</span>:
+        candidate = <span class="token function">ordinary_relaxation</span>(pose, protein)
+    <span class="token keyword">return</span> candidate</code></pre>
+    <p class="reading-note">The deterministic verifier routes the cascade; full PoseBusters validity is evaluated on the output. These checks have separate roles. Reference RMSD does not enter this selection rule.</p>
+
+    <h2 id="controls">The control that moved</h2>
+    <p>Would any similar scope work? On 166 poses, guided and random repair both made 160 valid under soft restraints. The experiment failed its locked specificity criterion. A control scope could still repair the real clash because atoms outside the scope were free to move against a soft penalty.</p>
+    <p>Let <span class="katex-inline">x^0</span> be the starting coordinates and <span class="katex-inline">F</span> the atoms outside the movable set, including the protein. The soft implementation adds a quadratic tether to the prepared system’s potential, <span class="katex-inline">E_0</span>:</p>
+    <div class="equation" id="eq-soft" tabindex="0" role="region" aria-label="Soft restraint objective">
+      <div class="math-display">E_{\mathrm{soft}}(x)=E_0(x)+\frac{\kappa}{2}\sum_{i\in F}\lVert x_i-x_i^0\rVert_2^2</div>
+    </div>
+    <p>A finite penalty still lets an atom move if the rest of the energy decreases enough. Hard freezing instead constrains the optimization:</p>
+    <div class="equation" id="eq-hard" tabindex="0" role="region" aria-label="Hard freeze constrained minimization">
+      <div class="math-display">\begin{aligned}\min_x\;&E_0(x)\\\text{subject to}\;&x_i=x_i^0\quad(i\in F)\end{aligned}</div>
+    </div>
+    <p class="reading-note">Selected heavy atoms bring their attached hydrogens into the movable set. The hard boundary uses zero-mass frozen particles in OpenMM. All arms in this diagnostic used a 100-iteration cap; the constrained minimum describes the objective, not a guarantee of global convergence.</p>
+    <p>Under soft restraints, even an excluded clash atom moved by roughly 0.36 Å in the random control. Under hard freezing, the maximum frozen-heavy-atom displacement was zero. Once the boundary held, the true witness mattered.</p>
+    <figure class="wide" id="fig-specificity">
+      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/specificity-mobile.svg" width="340" height="315"><img src="assets/verifiable-docking/specificity.svg" width="900" height="285" loading="lazy" alt="With the true clash excluded from control scopes, guided validity exceeds random by 60.9 percentage points, 95 percent interval 48.7 to 72.9, and swapped by 56.5 points, interval 43.9 to 69.3."></picture>
+      <figcaption><span class="figure-label">Figure 3.</span> Guided repair’s advantage when control scopes exclude the true clash. Lines are 95% target-bootstrap intervals for the random (127 poses) and swapped (119 poses) subsets; labels round the target-balanced estimates.</figcaption>
+    </figure>
+    <p>This supports a role for location information under the tested intervention. It does not reverse the failed soft experiment: hard freezing was a <strong>post-hoc mechanism diagnostic</strong>, and its top-5 joint success still fell below ordinary relaxation.</p>
+
+    <h2 id="cascade">Covering several clashes</h2>
+    <p>A single anchor can be informative and still miss a problem elsewhere in the ligand. On its locked holdout, about half the poses needed fallback, making the full procedure slower. The next operator covered several implicated regions at once.</p>
+    <p>The multi-component operator groups connected clash atoms, chooses an anchor for each group, and unions their local neighborhoods. After finding a passing pose <span class="katex-inline">x^1</span>, it can shorten the edit by moving back toward the input:</p>
+    <div class="equation" id="eq-backtrack" tabindex="0" role="region" aria-label="Backtracking interpolation"><div class="math-display">\begin{gathered}x(\alpha)=x^0+\alpha(x^1-x^0),\\0\leq\alpha\leq1.\end{gathered}</div></div>
+    <p>A short bisection search keeps a verifier-passing step. This reduces unnecessary motion along that path; it does not find a globally minimal edit.</p>
+    <p>The new PoseX holdout had no pair or ligand-group overlap with earlier splits. Its repair cohort contained 127 poses. This tests fresh ligands and predictions; it does not establish transfer to unseen protein families.</p>
+    <figure class="wide" id="fig-cascade">
+      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/cascade-mobile.svg" width="340" height="635"><img src="assets/verifiable-docking/cascade.svg" width="900" height="380" loading="lazy" alt="Schematic molecular repair routes: 104 of 127 poses are resolved by moving local regions; 23 restart with whole-ligand ordinary relaxation. Both routes lead to a total of 127 valid outputs in this holdout."></picture>
+      <figcaption><span class="figure-label">Figure 4.</span> Repair locally, widen the scope when needed. Blue regions show what may move in each repair sketch. The blue path resolves 104 poses locally; the gray path sends 23 through ordinary relaxation. All 127 final outputs passed full validity in this holdout. Molecules and paths are schematic.</figcaption>
+    </figure>
+    <div class="baseline-results" id="table-baseline">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison with ordinary relaxation, horizontally scrollable">
+        <table class="booktabs" aria-describedby="baseline-table-note">
+          <caption><span>Table 2. Against ordinary relaxation on the same fresh PoseX holdout: 200 cases, with 127 poses in the repair cohort.</span></caption>
+          <thead>
+            <tr>
+              <th scope="col" rowspan="2">Method</th>
+              <th scope="col" rowspan="2" class="numeric">Top-5 joint ↑<span class="table-unit">cases</span></th>
+              <th scope="col" rowspan="2" class="numeric">Displacement ↓<span class="table-unit">Å · median</span></th>
+              <th scope="colgroup" colspan="2" class="timing-group">Speedup ↑</th>
+            </tr>
+            <tr><th scope="col" class="numeric">Minimization</th><th scope="col" class="numeric">Recorded wall</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Ordinary relaxation<span class="table-unit">baseline</span></th><td class="numeric">65/200</td><td class="numeric">0.301</td><td class="numeric">1.00×</td><td class="numeric">1.00×</td></tr>
+            <tr><th scope="row">Multi-component cascade<span class="table-unit">local repair + fallback</span></th><td class="numeric">65/200</td><td class="numeric"><strong>0.193</strong></td><td class="numeric"><strong>3.14×</strong></td><td class="numeric"><strong>1.08×</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note" id="baseline-table-note">Bold marks observed improvements over the baseline. Displacement is RMS motion over ligand heavy atoms, then median across repair poses. Speedups are relative to ordinary relaxation and include fallback: a ratio of median minimization times, and a ratio of summed recorded wall times.</p>
+    </div>
+    <p>The multi-component confirmation <strong>met its prespecified targets</strong>, including its matched-control comparisons. Fallback preserved the observed joint count. The conclusion is limited to that operator and holdout.</p>
+
+    <h2 id="timing">The full cost of repair</h2>
+    <p>The cascade’s minimization time improved by <strong>3.14×</strong>, but recorded repair wall time improved by only <strong>1.08×</strong>. The first compares median minimization times; the second divides summed wall times. Both include ordinary fallback where needed.</p>
+    <p>This is the kind of limit behind Amdahl’s argument <a class="ref" href="#ref-amdahl">[11]</a>: other costs remain when one part becomes faster. Detection and verification still take time. The two ratios cannot give us a timing breakdown, but they make the next profiling target clear: the repair as a whole.</p>
+    <p class="reading-note">Recorded wall time covers the repair call and initial clash detection. Docking, preparation, and surrounding scope construction are outside this comparison.</p>
+
+    <h2 id="learning">Learning the scope</h2>
+    <p>The early MLP pilot did not establish a witness benefit. A separate development study, <em>WISAN</em>, found a more promising signal with a factor-graph GNN. It ranked a frozen, witness-independent library of candidate scopes, evaluated out of fold across 43 disjoint families.</p>
+    <div class="definitions">
+      <p><strong>Sparse-Valid@3:</strong> verify up to three ranked candidates, stopping at the first Exact-20 pass. Count success only if that accepted scope moves at most 30% of ligand heavy atoms.</p>
+      <p>Exact-20 is this study’s endpoint. It is distinct from the earlier full PoseBusters endpoint, and does not establish near-native docking accuracy.</p>
+    </div>
+    <figure class="wide" id="fig-selector">
+      <picture><source media="(max-width: 600px)" srcset="assets/verifiable-docking/selector-mobile.svg" width="300" height="900"><img src="assets/verifiable-docking/selector.svg" width="900" height="300" loading="lazy" alt="Three schematic witness inputs and GNN development results: correct witness 23.6 percent Sparse-Valid at 3, no witness 2.8 percent, and wrong witness 1.9 percent. Orange marks a clash; blue locates the supplied witness."></picture>
+      <figcaption><span class="figure-label">Figure 5.</span> The location information matters. Orange marks the same clash; blue marks the supplied witness. Each arm trains the same GNN architecture separately. Percentages are development OOF results, rounded to one decimal.</figcaption>
+    </figure>
+    <p>Both witness contrasts had positive family-bootstrap lower bounds. That supports useful location-dependent selection. The practical targets tell us what is still missing.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Unresolved GNN development targets">
+      <table><caption>Table 3. What the selector still needs to do.</caption>
+        <thead><tr><th scope="col">Requirement</th><th scope="col">Observed</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Keep accepted scopes small</th><td>50.6% median active fraction; target ≤ 30%</td></tr>
+          <tr><th scope="row">Stay within 5 points of oracle validity</th><td>58.5% vs. 66.0%; outside the margin</td></tr>
+          <tr><th scope="row">Preserve docking accuracy on new data</th><td>RMSD joint success not evaluated; strict holdout unopened</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The model learns validity and two cost scores: coordinate edit and work. The supplied implementation combines classification, pairwise ranking, cost regression, and calibration in one loss:</p>
+    <div class="equation" id="eq-loss" tabindex="0" role="region" aria-label="Implemented model training loss">
+      <div class="math-display">\begin{aligned}\mathcal L={}&\mathcal L_{\mathrm{wBCE}}+\mathcal L_{\mathrm{rank}}\\&+0.25\,\mathcal L_{\mathrm{cost}}+0.1\,\mathcal L_{\mathrm{Brier}}\end{aligned}</div>
+    </div>
+    <p>Weighted binary cross-entropy handles label imbalance; the Brier term measures probability error. The cost term fits log-scaled edit and work with Huber losses on valid candidates. Pairwise ranking uses a score that penalizes scope size and both predicted costs:</p>
+    <div class="equation" id="eq-utility" tabindex="0" role="region" aria-label="Candidate utility for ranking"><div class="math-display">\begin{aligned}u_c={}&z_c-a_c\\&-\operatorname{ReLU}(r_{d,c})-\operatorname{ReLU}(r_{w,c}).\end{aligned}</div></div>
+    <p>Here <span class="katex-inline">z_c</span> is the validity logit, <span class="katex-inline">a_c</span> the active heavy-atom fraction, and <span class="katex-inline">r_{d,c},r_{w,c}</span> the log-cost head outputs. Training pairs prefer valid candidates first, then smaller scopes, edits, and work:</p>
+    <div class="equation" id="eq-ranking-loss" tabindex="0" role="region" aria-label="Pairwise ranking loss"><div class="math-display">\mathcal L_{\mathrm{rank}}=\underset{(c^+,c^-)\in\mathcal P}{\operatorname{mean}}\operatorname{softplus}(u_{c^-}-u_{c^+}).</div></div>
+    <p>At inference, candidates with seed-averaged validity probability <span class="katex-inline">\bar p_c\geq0.25</span> are sorted by this tuple, from left to right:</p>
+    <div class="equation" id="eq-selection" tabindex="0" role="region" aria-label="Candidate selection order"><div class="math-display">\operatorname{key}(c)=\left(a_c,\widehat d_c,\widehat w_c,-\bar p_c,\operatorname{id}_c\right).</div></div>
+    <p>The edit and work scores are averaged, ReLU-clamped head outputs. The verifier makes the final acceptance decision. Sparsity and cost therefore already enter training and selection; they were simply not enough to meet the practical targets in this run. And better ranking cannot repair poses whose library contains no valid candidate.</p>
+
+    <h2 id="generalization">What still needs to travel</h2>
+    <p>Generalization needs a different split, not just another random sample. DockGen tests novel binding domains <a class="ref" href="#ref-dockgen">[12]</a>; PoseBench evaluates broader docking settings <a class="ref" href="#ref-posebench">[13]</a>. Our external studies also used Astex <a class="ref" href="#ref-astex">[14]</a> and CASP15 ligand tasks <a class="ref" href="#ref-casp15">[15]</a>.</p>
+    <p><strong>External confirmation is still missing.</strong> The broader policy experiments ran into lower utility, false accepts, insufficient cohorts, or failed specificity criteria. Those results keep the claim narrower than “local repair works everywhere.”</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Next experiments">
+      <table><caption>Table 4. The next experiments.</caption>
+        <thead><tr><th scope="col">Question</th><th scope="col">Next step</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Does repair transfer?</th><td>Freeze the multi-component operator; test an external family-disjoint holdout.</td></tr>
+          <tr><th scope="row">Can the whole repair be faster?</th><td>Profile detection, selection, verification, and fallback with minimization.</td></tr>
+          <tr><th scope="row">Can the learned selector be useful?</th><td>Evaluate docking accuracy and reduce active fraction and work before confirmation.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A failed physical check can tell us something useful about the intervention to make. Hard-freeze controls show why location matters; multi-component repair gives that information a useful role. Making it faster overall, sparse when learned, and reliable on unfamiliar proteins is the work still ahead.</p>
+
+    <h2 id="references">References</h2>
+    <ol class="references">
+      <li id="ref-vina">Trott &amp; Olson. <a href="https://doi.org/10.1002/jcc.21334">AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading.</a> <em>Journal of Computational Chemistry</em>, 2010.</li>
+      <li id="ref-gnina">McNutt et al. <a href="https://link.springer.com/article/10.1186/s13321-021-00522-2">GNINA 1.0: molecular docking with deep learning.</a> <em>Journal of Cheminformatics</em>, 2021.</li>
+      <li id="ref-equibind">Stärk et al. <a href="https://proceedings.mlr.press/v162/stark22b.html">EquiBind: Geometric Deep Learning for Drug Binding Structure Prediction.</a> ICML, 2022.</li>
+      <li id="ref-tankbind">Lu et al. <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/2f89a23a19d1617e7fb16d4f7a049ce2-Abstract-Conference.html">TANKBind: Trigonometry-Aware Neural NetworKs for Drug-Protein Binding Structure Prediction.</a> NeurIPS, 2022.</li>
+      <li id="ref-diffdock">Corso et al. <a href="https://arxiv.org/abs/2210.01776">DiffDock: Diffusion Steps, Twists, and Turns for Molecular Docking.</a> ICLR, 2023.</li>
+      <li id="ref-posebusters">Buttenschoen, Morris &amp; Deane. <a href="https://doi.org/10.1039/D3SC04185A">PoseBusters: AI-based docking methods fail to generate physically valid poses or generalise to novel sequences.</a> <em>Chemical Science</em>, 2024.</li>
+      <li id="ref-rdkit">RDKit contributors. <a href="https://www.rdkit.org/docs/Overview.html">RDKit: Open-source cheminformatics.</a> Project documentation.</li>
+      <li id="ref-posex">Jiang et al. <a href="https://arxiv.org/abs/2505.01700">PoseX: AI Defeats Physics Approaches on Protein-Ligand Cross Docking.</a> arXiv, 2025; revised 2026.</li>
+      <li id="ref-openmm">Eastman et al. <a href="https://arxiv.org/abs/2310.03121">OpenMM 8: Molecular Dynamics Simulation with Machine Learning Potentials.</a> <em>Journal of Physical Chemistry B</em>, 2024. Cited for the simulation toolkit, not as a claim about the version used in these runs.</li>
+      <li id="ref-factorgraphs">Kschischang, Frey &amp; Loeliger. <a href="https://www.isiweb.ee.ethz.ch/papers/arch/aloe-2001-1.pdf">Factor graphs and the sum-product algorithm.</a> <em>IEEE Transactions on Information Theory</em>, 2001. Background on the representation, not the repair algorithm.</li>
+      <li id="ref-amdahl">Amdahl. <a href="https://doi.org/10.1145/1465482.1465560">Validity of the single processor approach to achieving large scale computing capabilities.</a> AFIPS Spring Joint Computer Conference, 1967.</li>
+      <li id="ref-dockgen">Corso et al. <a href="https://arxiv.org/abs/2402.18396">Deep Confident Steps to New Pockets: Strategies for Docking Generalization.</a> ICLR, 2024.</li>
+      <li id="ref-posebench">Morehead et al. <a href="https://arxiv.org/abs/2405.14108">Assessing the potential of deep learning for protein-ligand docking.</a> PoseBench; arXiv, 2024, revised 2026.</li>
+      <li id="ref-astex">Hartshorn et al. <a href="https://pubmed.ncbi.nlm.nih.gov/17300160/">Diverse, high-quality test set for the validation of protein-ligand docking performance.</a> <em>Journal of Medicinal Chemistry</em>, 2007.</li>
+      <li id="ref-casp15">Robin et al. <a href="https://pubmed.ncbi.nlm.nih.gov/37795762/">Assessment of protein-ligand complexes in CASP15.</a> <em>Proteins</em>, 2023.</li>
+    </ol>
+    <h2 id="citation">Citation</h2>
+    <pre class="citation-box">@misc{yoshihara2026verifiabledocking,
+  title={Verifiable Docking: Repairing Only What Needs to Move},
+  author={Kirato Yoshihara},
+  year={2026},
+  url={https://kiratoyoshihara.github.io/essays/verifiable-docking.html}
+}</pre>
+  </article>
+  </main>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" onload="document.querySelectorAll('.katex-inline, .math-display').forEach(el => katex.render(el.textContent, el, {displayMode: el.classList.contains('math-display'), throwOnError: false}));"></script>
+</body>
+</html>

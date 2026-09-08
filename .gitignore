@@ -1,2 +1,5 @@
 essays/template.html
 .vscode/*
+
+# Local research materials used for the essays.
+supplementary-material/*
