@@ -139,7 +139,7 @@
     <h2 id="introduction">Introduction</h2>
     <p>A docking model can put a molecule in roughly the right place and still push one of its atoms into the protein. The usual fix is force-field relaxation: let the molecule settle into a lower-energy pose. That fix worked well enough to change the question behind this project.</p>
     <p><strong>Can a failed check tell us which parts of the molecule need to move?</strong> A clash comes with a clue: the atoms that are in the way. We want to use that clue to keep the useful parts of a pose while giving the troublesome regions enough freedom to move.</p>
-    <p>On a fresh PoseX holdout, multi-component repair matched ordinary relaxation’s observed top-5 joint success with less displacement. Minimization was <strong>3.14×</strong> faster by the ratio of medians; recorded repair wall time improved by <strong>1.08×</strong>. The clash location gave us a useful handle on the repair.</p>
+    <p>On a fresh PoseX holdout, multi-component repair matched ordinary relaxation’s observed top-5 joint success with less displacement. Minimization was <strong>3.14×</strong> faster by the ratio of medians; recorded repair wall time improved by <strong>1.08×</strong>. Choosing what moves helped, but most of the speedup disappeared outside the minimizer.</p>
 
     <p>We’ll start with a quick picture of docking, then follow the experiments from local repair and matched controls to learned scope selection—and see how much of the speedup survives across the whole pipeline.</p>
 
