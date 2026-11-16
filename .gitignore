@@ -1,5 +1,6 @@
 essays/template.html
 .vscode/*
+.DS_Store
 
 # Local research materials used for the essays.
 supplementary-material/*
